@@ -1,0 +1,81 @@
+.card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px;
+  transition: all 0.22s; cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  position: relative; overflow: hidden;
+}
+.card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--grad-accent);
+  opacity: 0; transition: opacity 0.22s;
+  border-radius: var(--radius-sm);
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25), var(--glow-accent);
+}
+.card:hover::after { opacity: 0.04; }
+
+.animBox {
+  width: 100%; height: 130px;
+  border-radius: 8px; overflow: hidden;
+  background: var(--surface3);
+  margin-bottom: 10px;
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  .animBox { height: 110px; }
+  .name { font-size: 12px !important; }
+  .sets { font-size: 11px !important; }
+  .tip { font-size: 10px !important; }
+}
+
+.imgWrap { position: relative; width: 100%; height: 100%; }
+
+.img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+}
+.img0 { animation: flip0 1.4s steps(1) infinite; }
+.img1 { animation: flip1 1.4s steps(1) infinite; }
+
+@keyframes flip0 {
+  0%, 49.9% { opacity: 1; }
+  50%, 100%  { opacity: 0; }
+}
+@keyframes flip1 {
+  0%, 49.9% { opacity: 0; }
+  50%, 100%  { opacity: 1; }
+}
+
+.fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--surface3) 0%, var(--surface4) 100%);
+}
+.fallbackIcon { font-size: 40px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2)); }
+
+.name {
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  color: var(--text); margin-bottom: 4px; position: relative; z-index: 1;
+}
+.sets {
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent);
+  margin-bottom: 4px; position: relative; z-index: 1;
+}
+.muscles {
+  font-size: 10px; color: var(--text3); margin-bottom: 7px;
+  position: relative; z-index: 1;
+}
+.tip {
+  font-size: 11px; color: var(--text2); line-height: 1.5;
+  padding: 7px 10px; background: rgba(0,229,192,0.06);
+  border-radius: 5px; border-left: 2px solid var(--accent);
+  position: relative; z-index: 1;
+}

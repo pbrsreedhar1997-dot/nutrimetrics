@@ -1,0 +1,192 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Selector card ────────────────────────── */
+.selectorCard, .weekCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.cardTitle {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-bottom: 16px;
+}
+.subTitle {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-bottom: 12px;
+}
+
+/* ── Goal grid ────────────────────────────── */
+.goalGrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.goalCard {
+  padding: 16px 10px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer; text-align: center; transition: all 0.22s;
+  touch-action: manipulation; position: relative; overflow: hidden;
+}
+.goalCard::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--grad-accent); opacity: 0;
+  transition: opacity 0.22s;
+}
+.goalCard:hover { border-color: var(--accent); transform: translateY(-2px); }
+.goalCard:hover::before { opacity: 0.04; }
+.goalCard.selected {
+  border-color: var(--accent);
+  background: rgba(0,229,192,0.06);
+  box-shadow: 0 0 0 3px rgba(0,229,192,0.12), var(--shadow-accent);
+  transform: translateY(-2px);
+}
+.goalIcon { font-size: 28px; margin-bottom: 8px; position: relative; z-index: 1; }
+.goalName {
+  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--text); position: relative; z-index: 1;
+}
+.goalDesc { font-size: 10px; color: var(--text3); margin-top: 4px; line-height: 1.5; position: relative; z-index: 1; }
+
+/* ── Level buttons ────────────────────────── */
+.levelWrap { margin-top: 6px; }
+.levelBtns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.levelBtn {
+  padding: 8px 18px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 22px; color: var(--text3);
+  font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+  text-transform: capitalize; letter-spacing: 0.3px;
+}
+.levelBtn:hover { border-color: var(--accent); color: var(--text); }
+.levelBtn.active {
+  background: var(--grad-accent); color: #000;
+  border-color: transparent; box-shadow: var(--shadow-accent);
+}
+
+.hint {
+  margin-bottom: 14px; padding: 12px 16px;
+  font-size: 12px; color: var(--text2);
+  background: rgba(0,229,192,0.06);
+  border-radius: var(--radius-xs);
+  border-left: 3px solid var(--accent); line-height: 1.6;
+}
+
+.genBtn {
+  width: 100%; padding: 15px;
+  background: var(--grad-accent);
+  border: none; border-radius: var(--radius-sm); color: #000;
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+  box-shadow: var(--shadow-accent); letter-spacing: 0.3px;
+}
+.genBtn:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,229,192,0.35); }
+.genBtn:active { transform: translateY(0); }
+
+/* ── Plan output ──────────────────────────── */
+.planOutput { display: flex; flex-direction: column; gap: 14px; animation: fadeUp 0.35s cubic-bezier(0.22,1,0.36,1); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
+
+.planHeader {
+  background: var(--grad-hero);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  display: flex; align-items: flex-start; gap: 16px;
+  position: relative; overflow: hidden;
+}
+.planHeader::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad-accent);
+}
+.planIcon { font-size: 36px; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+.planName { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); }
+.planSub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.badge {
+  padding: 3px 10px; border-radius: 20px;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 0.5px; font-weight: 500;
+}
+.badge_green  { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+.badge_accent { background: rgba(0,229,192,0.1);  color: var(--accent); border: 1px solid rgba(0,229,192,0.2); }
+.badge_amber  { background: rgba(251,191,36,0.1);  color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+.badge_red    { background: rgba(248,113,113,0.1); color: var(--red);   border: 1px solid rgba(248,113,113,0.2); }
+
+/* ── Week grid ────────────────────────────── */
+.weekCard { padding: 18px; }
+.weekScroll { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+.weekScroll::-webkit-scrollbar { height: 2px; }
+.weekGrid {
+  display: grid; grid-template-columns: repeat(7, minmax(52px, 1fr));
+  gap: 8px; min-width: 420px;
+}
+.dayPill {
+  padding: 10px 4px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); text-align: center; cursor: pointer;
+  transition: all 0.2s; touch-action: manipulation;
+}
+.dayPill:hover:not(.restDay) { border-color: var(--accent); transform: translateY(-1px); }
+.dayPill.dayActive {
+  background: var(--grad-accent); border-color: transparent;
+  box-shadow: var(--shadow-accent); transform: translateY(-1px);
+}
+.dayPill.restDay { opacity: 0.45; cursor: default; }
+.dayPill.restDay:hover { border-color: var(--border); transform: none; }
+.dayName {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text3);
+}
+.dayPill.dayActive .dayName { color: #000; }
+.dayType { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; color: var(--text2); margin-top: 4px; }
+.dayPill.dayActive .dayType { color: #000; }
+.dayDot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin: 5px auto 0; }
+.dayPill.dayActive .dayDot { background: rgba(0,0,0,0.4); }
+.dayPill.restDay .dayDot { background: var(--border); }
+
+/* ── Day panel ────────────────────────────── */
+.dayPanel {
+  background: var(--grad-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  animation: fadeUp 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.dayHeader {
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 20px; background: var(--surface2);
+  border-bottom: 1px solid var(--border); justify-content: space-between;
+}
+.dayHeaderLabel { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; color: var(--text); }
+.dayHeaderSub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+.exGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 14px; }
+
+.restCard { padding: 48px 20px; text-align: center; color: var(--text3); }
+.restIcon { font-size: 48px; margin-bottom: 14px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2)); }
+.restTitle { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text2); }
+.restSub { font-size: 13px; margin-top: 8px; line-height: 1.6; max-width: 280px; margin-left: auto; margin-right: auto; }
+
+/* ── Mobile ────────────────────────────────── */
+@media (max-width: 600px) {
+  .selectorCard, .weekCard { padding: 16px; }
+  .planHeader { padding: 14px 16px; }
+  .planName { font-size: 17px; }
+  .planIcon { font-size: 30px; }
+  .exGrid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
+  .dayHeader { padding: 12px 14px; }
+  .dayHeaderLabel { font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .goalGrid { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .goalIcon { font-size: 22px; }
+  .goalName { font-size: 10px; }
+  .goalDesc { display: none; }
+  .goalCard { padding: 12px 6px; }
+}
+
+@media (max-width: 380px) {
+  .goalGrid { grid-template-columns: 1fr; gap: 8px; }
+  .goalDesc { display: block; }
+  .exGrid { grid-template-columns: 1fr; }
+}

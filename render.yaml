@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: nutrimetrics
+    env: node
+    region: singapore
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: nutrimetrics-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

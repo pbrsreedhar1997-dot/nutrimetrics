@@ -1,0 +1,209 @@
+/* ═══════════════ Header / Nav ═══════════════ */
+
+.topbar {
+  position: sticky; top: 0; z-index: 200;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background: rgba(8,11,18,0.82);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="light"] .topbar {
+  background: rgba(240,243,250,0.88);
+}
+
+.header {
+  padding: 16px 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ── Logo ───────────────────────────────── */
+.logo { display: flex; flex-direction: column; flex-shrink: 0; cursor: default; }
+.logoName {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.5px; color: var(--text);
+  white-space: nowrap; line-height: 1;
+}
+.logoName span {
+  background: var(--grad-accent);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.logoTag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--text3);
+  letter-spacing: 2.5px; text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* ── Actions ────────────────────────────── */
+.actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.themeToggle {
+  width: 44px; height: 24px;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.themeToggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--grad-accent);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 8px rgba(0,229,192,0.4);
+}
+.themeToggle[data-theme="light"]::after { transform: translateX(20px); }
+
+.userChip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 22px;
+  padding: 3px 12px 3px 3px;
+  transition: border-color 0.2s;
+}
+.userChip:hover { border-color: var(--accent); }
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--grad-accent);
+  color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 12px;
+  flex-shrink: 0;
+}
+.uname {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  font-family: 'Syne', sans-serif;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 90px;
+}
+.logoutBtn {
+  font-size: 11px; color: var(--red);
+  background: none; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  padding: 4px 2px; opacity: 0.75; transition: opacity 0.2s;
+  white-space: nowrap; touch-action: manipulation;
+}
+.logoutBtn:hover { opacity: 1; }
+
+.loginBtn {
+  padding: 9px 18px;
+  background: var(--grad-accent);
+  border: none; border-radius: 22px;
+  color: #000;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  white-space: nowrap; touch-action: manipulation;
+  box-shadow: var(--shadow-accent);
+}
+.loginBtn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── Desktop Tabs ───────────────────────── */
+.tabs {
+  display: flex; gap: 3px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 4px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tabBtn {
+  flex: 1;
+  padding: 9px 14px;
+  background: transparent; border: none;
+  border-radius: 9px;
+  color: var(--text3);
+  font-family: 'Syne', sans-serif;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.22s;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.tabBtn:hover { color: var(--text2); background: var(--surface3); }
+.tabBtn.active {
+  background: var(--grad-accent);
+  color: #000;
+  box-shadow: 0 2px 14px rgba(0,229,192,0.35);
+}
+
+/* ── Mobile Bottom Nav ──────────────────── */
+.bottomNav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background: rgba(9,12,19,0.92);
+  border-top: 1px solid var(--border2);
+  padding: 8px 0 max(10px, env(safe-area-inset-bottom));
+}
+[data-theme="light"] .bottomNav {
+  background: rgba(240,243,250,0.94);
+}
+.bottomNavInner {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  max-width: 480px; margin: 0 auto;
+}
+.navItem {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 4px; background: none; border: none;
+  cursor: pointer; touch-action: manipulation;
+  transition: all 0.18s;
+  position: relative;
+}
+.navIcon { font-size: 20px; line-height: 1; transition: transform 0.18s; }
+.navItem.active .navIcon { transform: translateY(-2px); }
+.navLabel {
+  font-family: 'Syne', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.3px; text-transform: uppercase;
+  color: var(--text3); transition: color 0.18s;
+}
+.navItem.active .navLabel { color: var(--accent); }
+.navDot {
+  position: absolute; bottom: 2px;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--accent);
+  opacity: 0; transform: scale(0);
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.navItem.active .navDot { opacity: 1; transform: scale(1); }
+
+/* ── Mobile adjustments ─────────────────── */
+@media (max-width: 640px) {
+  .tabs { display: none; }
+  .bottomNav { display: block; }
+  .header { padding: 12px 0 10px; }
+  .logoName { font-size: 19px; }
+  .logoTag { display: none; }
+  .uname { display: none; }
+  .userChip { padding: 3px 8px 3px 3px; gap: 6px; }
+  .loginBtn { padding: 8px 14px; font-size: 12px; }
+}
+
+@media (max-width: 380px) {
+  .logoName { font-size: 17px; }
+  .themeToggle { width: 38px; height: 22px; }
+  .themeToggle::after { width: 14px; height: 14px; top: 3px; }
+  .themeToggle[data-theme="light"]::after { transform: translateX(16px); }
+  .actions { gap: 7px; }
+}

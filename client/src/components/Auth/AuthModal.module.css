@@ -1,0 +1,123 @@
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 100%; max-width: 420px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg), 0 0 80px rgba(0,229,192,0.06);
+  position: relative;
+  animation: slideUp 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad-accent); border-radius: 20px 20px 0 0;
+}
+@keyframes slideUp { from { transform: translateY(24px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+
+.closeBtn {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: 50%; width: 34px; height: 34px;
+  color: var(--text2); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; touch-action: manipulation;
+}
+.closeBtn:hover { background: var(--surface4); color: var(--text); }
+
+.logo {
+  font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800;
+  color: var(--text); text-align: center; margin-bottom: 4px;
+}
+.logo span {
+  background: var(--grad-accent);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle { text-align: center; font-size: 13px; color: var(--text3); margin-bottom: 28px; }
+
+.tabs {
+  display: flex; gap: 3px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 11px; padding: 4px; margin-bottom: 24px;
+}
+.tabBtn {
+  flex: 1; padding: 10px;
+  border: none; border-radius: 8px;
+  background: transparent; color: var(--text3);
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+  letter-spacing: 0.2px;
+}
+.tabBtn.active {
+  background: var(--grad-accent); color: #000;
+  box-shadow: 0 2px 12px rgba(0,229,192,0.3);
+}
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.8px; text-transform: uppercase; }
+.field input {
+  padding: 13px 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'DM Mono', monospace; font-size: 16px;
+  transition: all 0.2s;
+}
+.field input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,229,192,0.1);
+  background: var(--surface3);
+}
+.field input::placeholder { color: var(--text4); }
+
+.error {
+  background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25);
+  border-radius: var(--radius-xs); padding: 10px 14px;
+  font-size: 13px; color: var(--red);
+  border-left: 3px solid var(--red);
+}
+
+.submitBtn {
+  padding: 15px; background: var(--grad-accent); border: none;
+  border-radius: var(--radius-sm); color: #000;
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-top: 4px;
+  touch-action: manipulation; box-shadow: var(--shadow-accent);
+  letter-spacing: 0.3px;
+}
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.92; transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0,229,192,0.35);
+}
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Mobile ────────────────────────────────── */
+@media (max-width: 600px) {
+  .overlay { padding: 0; align-items: flex-end; }
+  .card {
+    border-radius: 24px 24px 0 0;
+    padding: 32px 22px max(40px, env(safe-area-inset-bottom));
+    max-height: 92vh;
+    animation: slideUpMobile 0.32s cubic-bezier(0.22,1,0.36,1);
+  }
+  .card::before { border-radius: 24px 24px 0 0; }
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+}

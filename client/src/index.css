@@ -1,0 +1,158 @@
+/* ═══════════════════════════════════════════════
+   NutriMetrics — Design System
+   ═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Base */
+  --bg: #080b12;
+  --surface: #0f1319;
+  --surface2: #161c27;
+  --surface3: #1d2333;
+  --surface4: #232a3d;
+
+  /* Borders */
+  --border: #1e2638;
+  --border2: #2a3348;
+  --border3: #344060;
+
+  /* Text */
+  --text: #eef0f8;
+  --text2: #8896b3;
+  --text3: #4e5d7a;
+  --text4: #2e3a52;
+
+  /* Brand */
+  --accent:  #00e5c0;
+  --accent2: #00b896;
+  --accent3: #00f5d0;
+  --purple:  #a78bfa;
+  --purple2: #7c5ef5;
+  --blue:    #60a5fa;
+  --blue2:   #3b82f6;
+
+  /* Status */
+  --green:  #34d399;
+  --amber:  #fbbf24;
+  --red:    #f87171;
+  --yellow: #fbbf24;
+
+  /* Gradients */
+  --grad-accent:  linear-gradient(135deg, #00e5c0 0%, #0099ff 100%);
+  --grad-purple:  linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+  --grad-warm:    linear-gradient(135deg, #fbbf24 0%, #f87171 100%);
+  --grad-card:    linear-gradient(160deg, var(--surface) 0%, var(--surface2) 100%);
+  --grad-hero:    linear-gradient(135deg, var(--surface) 0%, #0d1828 100%);
+
+  /* Shadows */
+  --shadow:    0 4px 24px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.7);
+  --shadow-accent: 0 4px 24px rgba(0,229,192,0.2);
+  --glow-accent:   0 0 32px rgba(0,229,192,0.15);
+  --glow-purple:   0 0 32px rgba(167,139,250,0.15);
+
+  /* Layout */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+
+[data-theme="light"] {
+  --bg: #f0f3fa;
+  --surface: #ffffff;
+  --surface2: #f5f7fe;
+  --surface3: #eaedfa;
+  --surface4: #dfe3f5;
+
+  --border: #e0e5f5;
+  --border2: #cdd3ec;
+  --border3: #b8c0df;
+
+  --text: #0c1428;
+  --text2: #3d4f73;
+  --text3: #7a8aab;
+  --text4: #a8b4cc;
+
+  --accent:  #00c9aa;
+  --accent2: #00a88d;
+  --accent3: #00debb;
+
+  --shadow:    0 4px 24px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+  --shadow-accent: 0 4px 24px rgba(0,200,170,0.15);
+  --glow-accent:   0 0 32px rgba(0,200,170,0.1);
+  --glow-purple:   0 0 32px rgba(124,94,245,0.1);
+
+  --grad-hero: linear-gradient(135deg, #ffffff 0%, #f0f5ff 100%);
+}
+
+/* ── Reset ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient background orbs */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+body::before {
+  width: 600px; height: 600px;
+  top: -200px; right: -200px;
+  background: radial-gradient(circle, rgba(0,229,192,0.06) 0%, transparent 70%);
+}
+body::after {
+  width: 500px; height: 500px;
+  bottom: -100px; left: -150px;
+  background: radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 70%);
+}
+
+#root { position: relative; z-index: 1; }
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px 120px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ── Global ────────────────────────────────── */
+button, input, select { -webkit-tap-highlight-color: transparent; font-family: inherit; }
+input { caret-color: var(--accent); }
+
+/* ── Shared card pattern ───────────────────── */
+.card-glass {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 600px) {
+  .container { padding: 0 14px 90px; }
+  body::before { width: 300px; height: 300px; }
+  body::after  { width: 260px; height: 260px; }
+}
