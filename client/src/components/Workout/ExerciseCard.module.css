@@ -12,36 +12,49 @@
   box-shadow: 0 6px 20px rgba(0,0,0,0.25), var(--glow-accent);
 }
 
-/* ── Animation box ─────────────────────────────────── */
+/* ── Animation box ─────────────────────────── */
 .animBox {
-  width: 100%;
-  height: 140px;
-  border-radius: 8px;
-  overflow: hidden;
+  width: 100%; height: 140px;
+  border-radius: 8px; overflow: hidden;
+  background: var(--surface3);
   margin-bottom: 10px;
   position: relative;
-  /* Dark gradient background so white stick figure pops */
-  background: radial-gradient(ellipse at 50% 30%,
-    rgba(0,229,192,0.07) 0%,
-    var(--surface3) 60%,
-    var(--surface4) 100%);
-  border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* Subtle corner accent dots */
-.animBox::before {
-  content: '';
-  position: absolute; top: 6px; right: 6px;
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--accent); opacity: 0.4;
 }
 
 @media (max-width: 480px) {
   .animBox { height: 120px; }
 }
 
-/* ── Text content ──────────────────────────────────── */
+.imgWrap { position: relative; width: 100%; height: 100%; }
+
+.img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+}
+
+/* 10s total cycle → each image shows for 5s */
+.img0 { animation: show0 10s steps(1) infinite; }
+.img1 { animation: show1 10s steps(1) infinite; }
+
+@keyframes show0 {
+  0%,   49.9% { opacity: 1; }
+  50%, 100%   { opacity: 0; }
+}
+@keyframes show1 {
+  0%,   49.9% { opacity: 0; }
+  50%, 100%   { opacity: 1; }
+}
+
+/* ── Fallback ───────────────────────────────── */
+.fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--surface3) 0%, var(--surface4) 100%);
+}
+.fallbackIcon { font-size: 40px; }
+
+/* ── Text ───────────────────────────────────── */
 .name {
   font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
   color: var(--text); margin-bottom: 4px;
