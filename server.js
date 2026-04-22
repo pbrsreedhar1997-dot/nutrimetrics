@@ -18,8 +18,9 @@ const db = {
   proteinLogs:  new Datastore({ filename: path.join(DB_DIR, 'protein_logs.db'), autoload: true }),
   bmiLogs:      new Datastore({ filename: path.join(DB_DIR, 'bmi_logs.db'),     autoload: true }),
   workoutLogs:  new Datastore({ filename: path.join(DB_DIR, 'workout_logs.db'), autoload: true }),
-  dietLogs:     new Datastore({ filename: path.join(DB_DIR, 'diet_logs.db'),    autoload: true }),
-  dietGoals:    new Datastore({ filename: path.join(DB_DIR, 'diet_goals.db'),   autoload: true }),
+  dietLogs:     new Datastore({ filename: path.join(DB_DIR, 'diet_logs.db'),     autoload: true }),
+  dietGoals:    new Datastore({ filename: path.join(DB_DIR, 'diet_goals.db'),    autoload: true }),
+  activityLogs: new Datastore({ filename: path.join(DB_DIR, 'activity_logs.db'), autoload: true }),
 };
 
 // Indexes
@@ -29,6 +30,7 @@ db.proteinLogs.ensureIndex({ fieldName: 'userId' });
 db.bmiLogs.ensureIndex({ fieldName: 'userId' });
 db.dietLogs.ensureIndex({ fieldName: 'userId' });
 db.dietGoals.ensureIndex({ fieldName: 'userId' });
+db.activityLogs.ensureIndex({ fieldName: 'userId' });
 
 // ── Middleware ───────────────────────────────────────────────────
 app.use(cors());
@@ -220,6 +222,36 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
   const user = await db.users.findOneAsync({ _id: req.user.id });
   if (!user) return res.status(404).json({ error: 'User not found' });
   res.json({ id: user._id, username: user.username, email: user.email, created_at: user.created_at });
+});
+
+// ── Activity Log ─────────────────────────────────────────────────
+// Get last 7 days of activity
+app.get('/api/activity-log', authMiddleware, async (req, res) => {
+  const logs = await db.activityLogs.findAsync({ userId: req.user.id }).sort({ date: -1 }).limit(7);
+  res.json({ logs });
+});
+
+// Upsert today's activity (steps, distance, calories, activeMinutes)
+app.post('/api/activity-log', authMiddleware, async (req, res) => {
+  const { date, steps, distanceKm, caloriesBurned, activeMinutes, stepGoal } = req.body;
+  const d = date || new Date().toISOString().split('T')[0];
+  const existing = await db.activityLogs.findOneAsync({ userId: req.user.id, date: d });
+  if (existing) {
+    await db.activityLogs.updateAsync(
+      { userId: req.user.id, date: d },
+      { $set: { steps, distanceKm, caloriesBurned, activeMinutes, stepGoal, updated_at: new Date().toISOString() } }
+    );
+    res.json({ id: existing._id, message: 'Updated' });
+  } else {
+    const doc = await db.activityLogs.insertAsync({
+      userId: req.user.id, date: d,
+      steps: steps || 0, distanceKm: distanceKm || 0,
+      caloriesBurned: caloriesBurned || 0, activeMinutes: activeMinutes || 0,
+      stepGoal: stepGoal || 10000,
+      created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+    });
+    res.json({ id: doc._id, message: 'Saved' });
+  }
 });
 
 // ── Serve frontend ───────────────────────────────────────────────

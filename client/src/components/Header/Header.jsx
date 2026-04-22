@@ -5,6 +5,7 @@ const TABS = [
   { id: 'diet',    label: '🥗 Diet',     fullLabel: '🥗 Diet Tracker',    icon: '🥗', navLabel: 'Diet'    },
   { id: 'workout', label: '💪 Workout',  fullLabel: '💪 Workout Plans',   icon: '💪', navLabel: 'Workout' },
   { id: 'plan',    label: '📋 My Plan',  fullLabel: '📋 My Plan',         icon: '📋', navLabel: 'My Plan' },
+  { id: 'activity',label: '👟 Activity', fullLabel: '👟 Activity',        icon: '👟', navLabel: 'Activity' },
 ]
 
 export default function Header({ tab, onTabChange, username, isLoggedIn, onLoginClick, onLogout, theme, onThemeToggle }) {

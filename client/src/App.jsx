@@ -4,6 +4,7 @@ import AuthModal from './components/Auth/AuthModal'
 import Header from './components/Header/Header'
 import BMICalculator from './components/BMI/BMICalculator'
 import DietTracker from './components/DietTracker/DietTracker'
+import ActivityTracker from './components/Activity/ActivityTracker'
 import WorkoutPlans from './components/Workout/WorkoutPlans'
 import DietPlan from './components/DietPlan/DietPlan'
 
@@ -37,6 +38,7 @@ export default function App() {
         {tab === 'diet'    && <DietTracker token={token} userStats={userStats} />}
         {tab === 'workout' && <WorkoutPlans userStats={userStats} />}
         {tab === 'plan'    && <DietPlan userStats={userStats} onGoToBMI={() => setTab('bmi')} />}
+        {tab === 'activity'&& <ActivityTracker token={token} userStats={userStats} />}
       </div>
     </>
   )

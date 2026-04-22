@@ -1,0 +1,305 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Hero ───────────────────────────────────── */
+.hero {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), #60a5fa, var(--purple));
+}
+
+.heroTop {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Step Ring ──────────────────────────────── */
+.ringWrap {
+  position: relative; flex-shrink: 0;
+  width: 160px; height: 160px;
+}
+.ring { width: 160px; height: 160px; transform: rotate(-90deg); overflow: visible; }
+.ringBg {
+  fill: none; stroke: var(--surface3);
+  stroke-width: 12; stroke-linecap: round;
+}
+.ringFg {
+  fill: none;
+  stroke: url(#stepGrad);
+  stroke-width: 12; stroke-linecap: round;
+  stroke-dasharray: 427;
+  stroke-dashoffset: 427;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);
+  filter: drop-shadow(0 0 8px rgba(0,229,192,0.5));
+}
+
+.ringInner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.stepCount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px; font-weight: 700; color: var(--text); line-height: 1;
+}
+.stepLabel  { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+.stepGoalLabel { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text4); margin-top: 2px; }
+.stepPct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 700; color: var(--accent); margin-top: 4px;
+}
+
+/* ── Stats grid ─────────────────────────────── */
+.statsGrid {
+  display: flex; flex-direction: column; gap: 14px; flex: 1; min-width: 150px;
+}
+.stat {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  transition: border-color 0.2s;
+}
+.stat:hover { border-color: var(--accent); }
+.statIcon { font-size: 20px; flex-shrink: 0; }
+.statVal {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px; font-weight: 700; color: var(--text); line-height: 1;
+}
+.statLbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+/* ── Controls ───────────────────────────────── */
+.controls {
+  display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
+}
+.ctrlBtn {
+  flex: 1; padding: 15px 20px;
+  border: none; border-radius: var(--radius-sm); color: #000;
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.22s; touch-action: manipulation;
+  letter-spacing: 0.3px; min-height: 52px;
+}
+.start {
+  background: var(--grad-accent);
+  box-shadow: var(--shadow-accent);
+}
+.start:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,229,192,0.4); }
+.stop {
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+  box-shadow: 0 4px 16px rgba(251,191,36,0.3);
+}
+.stop:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.resetBtn {
+  padding: 15px 18px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); color: var(--text2);
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation; min-height: 52px;
+}
+.resetBtn:hover:not(:disabled) { background: var(--border2); color: var(--text); }
+.resetBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.noSensor {
+  width: 100%; padding: 18px 20px;
+  background: rgba(248,113,113,0.06);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--text2); line-height: 1.6; text-align: center;
+}
+.noSensor span { font-size: 24px; display: block; margin-bottom: 6px; }
+.noSensor small { font-size: 12px; color: var(--text3); }
+
+/* ── Goal row ───────────────────────────────── */
+.goalRow {
+  display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap;
+}
+.goalText { font-size: 13px; color: var(--text2); flex: 1; }
+.goalText strong { color: var(--accent); font-family: 'Space Grotesk', sans-serif; }
+.editGoalBtn {
+  padding: 7px 14px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 20px; color: var(--text3);
+  font-size: 12px; font-weight: 600; font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+}
+.editGoalBtn:hover { border-color: var(--accent); color: var(--accent); }
+.goalRow label { font-size: 12px; color: var(--text3); white-space: nowrap; }
+.goalRow input {
+  width: 90px; padding: 9px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 15px;
+  -moz-appearance: textfield; appearance: textfield;
+  transition: border-color 0.2s;
+}
+.goalRow input:focus { outline: none; border-color: var(--accent); }
+.goalRow input::-webkit-outer-spin-button,
+.goalRow input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.goalRow button:not(.cancelBtn):not(.editGoalBtn) {
+  padding: 9px 16px;
+  background: var(--grad-accent); border: none; border-radius: var(--radius-xs);
+  color: #000; font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  touch-action: manipulation; transition: opacity 0.2s;
+}
+.goalRow button:not(.cancelBtn):not(.editGoalBtn):hover { opacity: 0.9; }
+.cancelBtn {
+  background: none; border: none; color: var(--text3); font-size: 16px;
+  cursor: pointer; padding: 6px; line-height: 1; touch-action: manipulation;
+}
+
+/* ── Live pulse ─────────────────────────────── */
+.livePulse {
+  margin-top: 12px; padding: 10px 14px;
+  background: rgba(0,229,192,0.06); border: 1px solid rgba(0,229,192,0.2);
+  border-radius: var(--radius-xs);
+  font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px;
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+  animation: pulse 1.2s ease infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── Achievement badges ─────────────────────── */
+.badgeRow {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+}
+.badge {
+  padding: 14px 10px; border-radius: var(--radius-sm); text-align: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  transition: all 0.25s;
+}
+.badge.earned {
+  background: rgba(0,229,192,0.08);
+  border-color: rgba(0,229,192,0.4);
+  box-shadow: 0 0 16px rgba(0,229,192,0.1);
+}
+.badgeText {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px; font-weight: 700; color: var(--text2);
+}
+.badge.earned .badgeText { color: var(--accent); }
+.badgeSub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); margin-top: 4px; }
+
+/* ── Weekly bar chart ───────────────────────── */
+.chartCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.cardTitle {
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-bottom: 20px;
+}
+.chartLoading { text-align: center; color: var(--text3); font-size: 13px; padding: 20px; }
+.barChart {
+  display: flex; align-items: flex-end; gap: 8px;
+  height: 120px; position: relative;
+  padding-bottom: 24px;
+}
+.barCol {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-end; height: 100%; position: relative;
+}
+.barWrap {
+  width: 100%; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-end; height: calc(100% - 20px); position: relative;
+}
+.barLabel {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text3);
+  margin-bottom: 3px; white-space: nowrap;
+}
+.bar {
+  width: 100%; border-radius: 4px 4px 0 0;
+  background: var(--surface3); border: 1px solid var(--border2);
+  transition: height 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  min-height: 4px;
+}
+.barToday {
+  background: var(--grad-accent);
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(0,229,192,0.3);
+}
+.barDay {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3);
+  position: absolute; bottom: 0; letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.barDayToday { color: var(--accent); font-weight: 700; }
+.goalFlag {
+  position: absolute; top: -16px;
+  font-size: 9px; color: var(--green); font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.goalLine {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: var(--border3);
+  border-top: 1px dashed var(--border3);
+  pointer-events: none;
+}
+.histNote {
+  text-align: center; font-size: 12px; color: var(--text3); margin-top: 12px;
+}
+
+/* ── Tips ───────────────────────────────────── */
+.tipsCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.tipsList { display: flex; flex-direction: column; gap: 10px; }
+.tip {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+}
+.tipIcon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── How it works ───────────────────────────── */
+.howCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.howGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.howItem {
+  padding: 14px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.howIcon { font-size: 24px; margin-bottom: 8px; }
+.howHead {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;
+}
+.howBody { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+/* ── Mobile ──────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero, .chartCard, .tipsCard, .howCard { padding: 16px; }
+  .heroTop { gap: 16px; }
+  .ringWrap { width: 140px; height: 140px; }
+  .ring { width: 140px; height: 140px; }
+  .ringFg, .ringBg { stroke-dasharray: 377; }
+  .stepCount { font-size: 26px; }
+  .badgeRow { grid-template-columns: 1fr 1fr; }
+  .howGrid { grid-template-columns: 1fr; }
+  .statsGrid { flex-direction: row; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 100px; }
+}
+
+@media (max-width: 400px) {
+  .ringWrap { width: 120px; height: 120px; }
+  .ring { width: 120px; height: 120px; }
+  .stepCount { font-size: 22px; }
+  .badgeRow { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat { padding: 10px 12px; }
+  .statVal { font-size: 17px; }
+}
