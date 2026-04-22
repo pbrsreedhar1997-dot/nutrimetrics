@@ -1,0 +1,339 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Hero / Calorie Ring ─────────────────────── */
+.hero {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad-accent);
+}
+
+.ringRow {
+  display: flex; align-items: center; gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* SVG Ring */
+.ringWrap {
+  position: relative; flex-shrink: 0;
+  width: 120px; height: 120px;
+}
+.ring { width: 120px; height: 120px; transform: rotate(-90deg); }
+.ringTrack {
+  fill: none; stroke: var(--surface3);
+  stroke-width: 10; stroke-linecap: round;
+}
+.ringFill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 327;
+  stroke-dashoffset: 327;
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.34,1.56,0.64,1);
+  filter: drop-shadow(0 0 6px rgba(0,229,192,0.5));
+}
+.ringInner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+.ringVal {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 700; color: var(--text); line-height: 1;
+}
+.ringUnit { font-size: 10px; color: var(--accent); font-weight: 600; margin-top: 1px; }
+.ringLabel { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); margin-top: 2px; }
+
+/* Macro bars */
+.macroList { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 10px; }
+.macroItem { display: flex; flex-direction: column; gap: 5px; }
+.macroTop { display: flex; justify-content: space-between; align-items: baseline; }
+.macroLabel { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+.macroVal {
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+}
+.macroVal small { font-size: 10px; font-weight: 400; color: var(--text3); }
+.macroTrack {
+  height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.macroFill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  min-width: 2px;
+}
+
+/* Edit goals */
+.editGoalBtn {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 20px; color: var(--text2);
+  font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+}
+.editGoalBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+.goalEdit {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  align-items: end;
+}
+.goalField { display: flex; flex-direction: column; gap: 6px; }
+.goalField label {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.7px;
+}
+.goalField input {
+  padding: 10px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 15px;
+  -moz-appearance: textfield; appearance: textfield;
+  transition: border-color 0.2s;
+}
+.goalField input:focus { outline: none; border-color: var(--accent); }
+.goalField input::-webkit-outer-spin-button,
+.goalField input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.saveGoalBtn {
+  grid-column: 1 / -1;
+  padding: 12px; background: var(--grad-accent);
+  border: none; border-radius: var(--radius-xs); color: #000;
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+  box-shadow: var(--shadow-accent); letter-spacing: 0.3px;
+}
+.saveGoalBtn:hover { opacity: 0.92; transform: translateY(-1px); }
+
+/* ── Vitamins & Minerals ─────────────────────── */
+.vitCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.vitTitle {
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-bottom: 16px;
+}
+.vitGrid { display: flex; flex-direction: column; gap: 12px; }
+.vitItem { display: flex; flex-direction: column; gap: 5px; }
+.vitTop { display: flex; justify-content: space-between; align-items: baseline; }
+.vitLabel { font-size: 13px; font-weight: 500; color: var(--text2); }
+.vitVal {
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.vitVal small { font-size: 10px; font-weight: 400; color: var(--text3); }
+.vitPct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3); margin-left: 6px;
+}
+.vitTrack {
+  height: 5px; background: var(--surface3); border-radius: 3px; overflow: hidden;
+}
+.vitFill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  min-width: 2px;
+}
+.vitRda { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text4); }
+
+/* ── Adder ───────────────────────────────────── */
+.adder {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.adderTitle {
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text3); margin-bottom: 16px;
+}
+.adderRow { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.searchWrap { flex: 2; min-width: 160px; display: flex; flex-direction: column; gap: 6px; }
+.gramsWrap  { flex: 1; min-width: 84px; max-width: 120px; display: flex; flex-direction: column; gap: 6px; }
+.fieldLabel { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; }
+
+.suggestContainer { position: relative; }
+.suggestContainer input {
+  width: 100%; padding: 13px 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 16px;
+  transition: all 0.2s;
+}
+.suggestContainer input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,229,192,0.1);
+  background: var(--surface3);
+}
+.suggestContainer input::placeholder { color: var(--text4); }
+
+.suggestions {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); z-index: 200;
+  box-shadow: var(--shadow-lg);
+  max-height: 260px; overflow-y: auto;
+}
+.sugItem {
+  padding: 11px 14px; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 14px; transition: background 0.12s;
+  border-bottom: 1px solid var(--border);
+  -webkit-tap-highlight-color: transparent;
+}
+.sugItem:last-child { border-bottom: none; }
+.sugItem:hover, .sugItem:active { background: var(--surface3); }
+.sugInfo {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent);
+  flex-shrink: 0; margin-left: 8px; white-space: nowrap;
+}
+
+.inputWrap { position: relative; }
+.inputWrap input {
+  width: 100%; padding: 13px 36px 13px 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 16px;
+  transition: all 0.2s;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.inputWrap input::-webkit-outer-spin-button,
+.inputWrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.inputWrap input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,229,192,0.1);
+  background: var(--surface3);
+}
+.unit {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--text3); pointer-events: none;
+}
+
+.btnAdd {
+  padding: 13px 22px;
+  background: var(--grad-accent);
+  border: none; border-radius: var(--radius-sm); color: #000;
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s;
+  align-self: flex-end; touch-action: manipulation; min-height: 50px;
+  box-shadow: var(--shadow-accent); letter-spacing: 0.3px;
+}
+.btnAdd:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.btnAdd:active { transform: translateY(0); }
+.btnAdd:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.preview {
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--accent); padding-left: 2px; line-height: 1.6;
+}
+
+/* ── Log ─────────────────────────────────────── */
+.logCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.logHeader {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface2);
+}
+.logHeader span {
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text3);
+}
+.btnClear {
+  font-size: 12px; color: var(--red); background: none; border: none;
+  cursor: pointer; opacity: 0.7; transition: opacity 0.2s;
+  padding: 4px 8px; border-radius: 5px; touch-action: manipulation; font-weight: 500;
+}
+.btnClear:hover { opacity: 1; background: rgba(248,113,113,0.08); }
+
+.empty {
+  padding: 40px 20px; text-align: center; color: var(--text3); font-size: 13px; line-height: 1.7;
+}
+.empty strong {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: var(--text2); margin-bottom: 6px;
+}
+
+.foodItem {
+  padding: 13px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; transition: background 0.12s;
+  animation: slideIn 0.25s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(-8px) } to { opacity: 1; transform: translateX(0) } }
+.foodItem:hover { background: var(--surface2); }
+.foodItem:last-child { border-bottom: none; }
+.foodEmoji { font-size: 22px; flex-shrink: 0; line-height: 1; }
+.foodInfo { flex: 1; min-width: 0; }
+.foodName {
+  font-size: 14px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.foodMacros {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3);
+  margin-top: 2px;
+}
+.btnRemove {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0; touch-action: manipulation;
+}
+.btnRemove:hover, .btnRemove:active { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* ── Auth note ───────────────────────────────── */
+.authNote {
+  text-align: center; font-size: 12px; color: var(--text3);
+  padding: 6px; line-height: 1.6;
+}
+
+/* ── Toast ───────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 88px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 12px 22px;
+  font-size: 14px; font-weight: 500; color: var(--text);
+  box-shadow: var(--shadow-lg); z-index: 1000; white-space: nowrap;
+  animation: toastIn 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px) }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) }
+}
+
+/* ── Mobile ──────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero, .vitCard, .adder { padding: 16px; }
+  .ringRow { gap: 16px; }
+  .ringWrap { width: 100px; height: 100px; }
+  .ring { width: 100px; height: 100px; }
+  .ringVal { font-size: 20px; }
+  .goalEdit { grid-template-columns: 1fr 1fr; }
+  .adderRow { flex-direction: column; gap: 12px; }
+  .searchWrap, .gramsWrap { width: 100%; max-width: 100%; flex: unset; min-width: unset; }
+  .btnAdd { width: 100%; display: flex; justify-content: center; }
+  .toast { bottom: 80px; max-width: calc(100vw - 32px); white-space: normal; text-align: center; font-size: 12px; }
+}
+
+@media (max-width: 400px) {
+  .ringRow { flex-direction: column; align-items: center; }
+  .macroList { width: 100%; }
+  .goalEdit { grid-template-columns: 1fr 1fr; }
+  .foodMacros { font-size: 9px; }
+}

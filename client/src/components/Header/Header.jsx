@@ -2,7 +2,7 @@ import styles from './Header.module.css'
 
 const TABS = [
   { id: 'bmi',     label: '⚖ BMI',      fullLabel: '⚖ BMI Calculator', icon: '⚖',  navLabel: 'BMI' },
-  { id: 'protein', label: '🥩 Protein',  fullLabel: '🥩 Protein Tracker', icon: '🥩', navLabel: 'Protein' },
+  { id: 'diet',    label: '🥗 Diet',     fullLabel: '🥗 Diet Tracker',    icon: '🥗', navLabel: 'Diet'    },
   { id: 'workout', label: '💪 Workout',  fullLabel: '💪 Workout Plans',   icon: '💪', navLabel: 'Workout' },
   { id: 'plan',    label: '📋 My Plan',  fullLabel: '📋 My Plan',         icon: '📋', navLabel: 'My Plan' },
 ]

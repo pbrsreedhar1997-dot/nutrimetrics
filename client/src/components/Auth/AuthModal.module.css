@@ -39,7 +39,7 @@
 .closeBtn:hover { background: var(--surface4); color: var(--text); }
 
 .logo {
-  font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700;
   color: var(--text); text-align: center; margin-bottom: 4px;
 }
 .logo span {
@@ -59,7 +59,7 @@
   flex: 1; padding: 10px;
   border: none; border-radius: 8px;
   background: transparent; color: var(--text3);
-  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
   cursor: pointer; transition: all 0.2s; touch-action: manipulation;
   letter-spacing: 0.2px;
 }
@@ -75,7 +75,7 @@
   padding: 13px 16px;
   background: var(--surface2); border: 1px solid var(--border);
   border-radius: var(--radius-sm); color: var(--text);
-  font-family: 'DM Mono', monospace; font-size: 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 16px;
   transition: all 0.2s;
 }
 .field input:focus {
@@ -95,7 +95,7 @@
 .submitBtn {
   padding: 15px; background: var(--grad-accent); border: none;
   border-radius: var(--radius-sm); color: #000;
-  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
   cursor: pointer; transition: all 0.2s; margin-top: 4px;
   touch-action: manipulation; box-shadow: var(--shadow-accent);
   letter-spacing: 0.3px;

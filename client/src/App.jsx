@@ -3,7 +3,7 @@ import { useAuth } from './hooks/useAuth'
 import AuthModal from './components/Auth/AuthModal'
 import Header from './components/Header/Header'
 import BMICalculator from './components/BMI/BMICalculator'
-import ProteinTracker from './components/Protein/ProteinTracker'
+import DietTracker from './components/DietTracker/DietTracker'
 import WorkoutPlans from './components/Workout/WorkoutPlans'
 import DietPlan from './components/DietPlan/DietPlan'
 
@@ -34,7 +34,7 @@ export default function App() {
           theme={theme} onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
         />
         {tab === 'bmi'     && <BMICalculator token={token} onBMIResult={handleBMIResult} />}
-        {tab === 'protein' && <ProteinTracker token={token} userStats={userStats} />}
+        {tab === 'diet'    && <DietTracker token={token} userStats={userStats} />}
         {tab === 'workout' && <WorkoutPlans userStats={userStats} />}
         {tab === 'plan'    && <DietPlan userStats={userStats} onGoToBMI={() => setTab('bmi')} />}
       </div>
