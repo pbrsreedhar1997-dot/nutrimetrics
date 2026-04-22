@@ -2,16 +2,45 @@ import { useState } from 'react'
 import { apiCall } from '../../api'
 import styles from './BMICalculator.module.css'
 
-export default function BMICalculator({ token, onBMIResult }) {
+const colorMap = { blue: '#5b9cf6', green: '#4ade80', yellow: '#fbbf24', red: '#ff5a5a' }
+const catColor  = { Underweight: 'blue', 'Normal Weight': 'green', Overweight: 'yellow', Obese: 'red' }
+const catDetail = {
+  Underweight:    'Below the healthy range. Consider consulting a nutritionist.',
+  'Normal Weight':'Great! You are within a healthy BMI range.',
+  Overweight:     'Slightly above healthy range. A balanced diet can help.',
+  Obese:          'Consider consulting a healthcare professional for a plan.',
+}
+
+function buildResult(bmi, cat, wKg, hCm) {
+  const colorKey    = catColor[cat] || 'green'
+  const hM          = hCm / 100
+  const minW        = (18.5 * hM * hM).toFixed(1)
+  const maxW        = (24.9 * hM * hM).toFixed(1)
+  const rangeStr    = `${minW}kg – ${maxW}kg`
+  const pct         = Math.min(100, Math.max(0, ((bmi - 10) / 30) * 100))
+  const proteinGoal = Math.round(wKg * 1.6)
+  return { bmi, cat, colorKey, detail: catDetail[cat] || '', rangeStr, pct, proteinGoal, wKg, hCm }
+}
+
+export default function BMICalculator({ token, onBMIResult, savedStats }) {
   const [heightUnit, setHeightUnit] = useState('cm')
   const [weightUnit, setWeightUnit] = useState('kg')
-  const [gender, setGender] = useState('m')
-  const [heightCm, setHeightCm] = useState('')
+
+  // Pre-fill from saved stats (always metric — we store weightKg / heightCm)
+  const [gender,   setGender]   = useState(savedStats?.gender || 'm')
+  const [heightCm, setHeightCm] = useState(savedStats?.heightCm ? String(Math.round(savedStats.heightCm)) : '')
   const [heightFt, setHeightFt] = useState('')
   const [heightIn, setHeightIn] = useState('')
-  const [weight, setWeight]     = useState('')
-  const [age, setAge]           = useState('')
-  const [result, setResult]     = useState(null)
+  const [weight,   setWeight]   = useState(savedStats?.weightKg  ? String(savedStats.weightKg)  : '')
+  const [age,      setAge]      = useState(savedStats?.age       ? String(savedStats.age)        : '')
+
+  // Restore last result immediately if saved stats exist
+  const [result, setResult] = useState(() => {
+    if (savedStats?.bmi && savedStats?.category && savedStats?.weightKg && savedStats?.heightCm) {
+      return buildResult(savedStats.bmi, savedStats.category, savedStats.weightKg, savedStats.heightCm)
+    }
+    return null
+  })
 
   function calculate() {
     let hCm = heightUnit === 'cm'
@@ -24,32 +53,26 @@ export default function BMICalculator({ token, onBMIResult }) {
     const hM  = hCm / 100
     const bmi = Math.round((wKg / (hM * hM)) * 10) / 10
 
-    let cat, colorKey, detail
-    if      (bmi < 18.5) { cat = 'Underweight'; colorKey = 'blue';   detail = 'Below the healthy range. Consider consulting a nutritionist.' }
-    else if (bmi < 25)   { cat = 'Normal Weight'; colorKey = 'green'; detail = 'Great! You are within a healthy BMI range.' }
-    else if (bmi < 30)   { cat = 'Overweight';  colorKey = 'yellow'; detail = 'Slightly above healthy range. A balanced diet can help.' }
-    else                 { cat = 'Obese';        colorKey = 'red';    detail = 'Consider consulting a healthcare professional for a plan.' }
+    let cat
+    if      (bmi < 18.5) cat = 'Underweight'
+    else if (bmi < 25)   cat = 'Normal Weight'
+    else if (bmi < 30)   cat = 'Overweight'
+    else                 cat = 'Obese'
 
-    const minW = (18.5 * hM * hM).toFixed(1)
-    const maxW = (24.9 * hM * hM).toFixed(1)
-    const rangeStr = weightUnit === 'kg'
-      ? `${minW}kg – ${maxW}kg`
-      : `${(minW * 2.20462).toFixed(1)}lbs – ${(maxW * 2.20462).toFixed(1)}lbs`
-
-    const pct = Math.min(100, Math.max(0, ((bmi - 10) / 30) * 100))
-    const proteinGoal = Math.round(wKg * 1.6)
-
+    const res    = buildResult(bmi, cat, wKg, hCm)
     const ageNum = parseInt(age) || null
-    const res = { bmi, cat, colorKey, detail, rangeStr, pct, proteinGoal, wKg, hCm }
     setResult(res)
-    onBMIResult && onBMIResult({ weightKg: wKg, heightCm: hCm, age: ageNum, gender, bmi, category: cat })
+
+    onBMIResult && onBMIResult({
+      weightKg: wKg, heightCm: hCm, age: ageNum, gender, bmi, category: cat
+    })
 
     if (token) {
-      apiCall('POST', '/bmi-log', { bmi, weight_kg: wKg, height_cm: hCm, category: cat }, token)
+      apiCall('POST', '/bmi-log', {
+        bmi, weight_kg: wKg, height_cm: hCm, category: cat, age: ageNum, gender
+      }, token)
     }
   }
-
-  const colorMap = { blue: '#5b9cf6', green: '#4ade80', yellow: '#fbbf24', red: '#ff5a5a' }
 
   return (
     <div className={styles.wrap}>
@@ -61,13 +84,15 @@ export default function BMICalculator({ token, onBMIResult }) {
             <div className={styles.labelRow}>
               <span>Height</span>
               <div className={styles.unitToggle}>
-                <button className={heightUnit === 'cm' ? styles.active : ''} onClick={() => setHeightUnit('cm')}>cm</button>
+                <button className={heightUnit === 'cm'   ? styles.active : ''} onClick={() => setHeightUnit('cm')}>cm</button>
                 <button className={heightUnit === 'ftin' ? styles.active : ''} onClick={() => setHeightUnit('ftin')}>ft/in</button>
               </div>
             </div>
             {heightUnit === 'cm' ? (
               <div className={styles.inputWrap}>
-                <input type="number" placeholder="170" value={heightCm} onChange={e => setHeightCm(e.target.value)} onKeyDown={e => e.key === 'Enter' && calculate()} />
+                <input type="number" inputMode="decimal" placeholder="170"
+                  value={heightCm} onChange={e => setHeightCm(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && calculate()} />
                 <span className={styles.unit}>cm</span>
               </div>
             ) : (
@@ -82,12 +107,14 @@ export default function BMICalculator({ token, onBMIResult }) {
             <div className={styles.labelRow}>
               <span>Weight</span>
               <div className={styles.unitToggle}>
-                <button className={weightUnit === 'kg' ? styles.active : ''} onClick={() => setWeightUnit('kg')}>kg</button>
+                <button className={weightUnit === 'kg'  ? styles.active : ''} onClick={() => setWeightUnit('kg')}>kg</button>
                 <button className={weightUnit === 'lbs' ? styles.active : ''} onClick={() => setWeightUnit('lbs')}>lbs</button>
               </div>
             </div>
             <div className={styles.inputWrap}>
-              <input type="number" placeholder="70" value={weight} onChange={e => setWeight(e.target.value)} onKeyDown={e => e.key === 'Enter' && calculate()} />
+              <input type="number" inputMode="decimal" placeholder="70"
+                value={weight} onChange={e => setWeight(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && calculate()} />
               <span className={styles.unit}>{weightUnit}</span>
             </div>
           </div>
@@ -96,7 +123,11 @@ export default function BMICalculator({ token, onBMIResult }) {
         <div className={styles.row}>
           <div className={styles.field}>
             <div className={styles.labelRow}><span>Age <small style={{ color: 'var(--text3)', fontSize: 10 }}>(optional)</small></span></div>
-            <div className={styles.inputWrap}><input type="number" placeholder="25" value={age} onChange={e => setAge(e.target.value)} /><span className={styles.unit}>yrs</span></div>
+            <div className={styles.inputWrap}>
+              <input type="number" inputMode="numeric" placeholder="25"
+                value={age} onChange={e => setAge(e.target.value)} />
+              <span className={styles.unit}>yrs</span>
+            </div>
           </div>
           <div className={styles.field}>
             <div className={styles.labelRow}><span>Gender <small style={{ color: 'var(--text3)', fontSize: 10 }}>(optional)</small></span></div>
@@ -107,15 +138,23 @@ export default function BMICalculator({ token, onBMIResult }) {
           </div>
         </div>
 
-        <button className={styles.calcBtn} onClick={calculate}>Calculate BMI</button>
+        <button className={styles.calcBtn} onClick={calculate}>
+          {result ? 'Recalculate BMI' : 'Calculate BMI'}
+        </button>
       </div>
 
       {result && (
         <div className={styles.result}>
           <div className={styles.scoreWrap}>
-            <div className={styles.circle} style={{ borderColor: colorMap[result.colorKey], boxShadow: `0 0 20px ${colorMap[result.colorKey]}30` }}>
-              <span className={styles.score}>{result.bmi}</span>
-              <span className={styles.scoreLabel}>BMI</span>
+            <div className={styles.circle} style={{
+              borderColor: colorMap[result.colorKey],
+              boxShadow: `0 0 20px ${colorMap[result.colorKey]}30`
+            }}>
+              <div className={styles.circleBg} />
+              <div className={styles.scoreInner}>
+                <div className={styles.score}>{result.bmi}</div>
+                <div className={styles.scoreLabel}>BMI</div>
+              </div>
             </div>
             <div className={styles.info}>
               <div className={styles.cat} style={{ color: colorMap[result.colorKey] }}>{result.cat}</div>
@@ -136,8 +175,11 @@ export default function BMICalculator({ token, onBMIResult }) {
           </div>
 
           <div className={styles.proteinSuggest}>
-            <div className={styles.suggestLabel}>Suggested daily protein goal from your weight</div>
-            <div className={styles.suggestVal}>{result.proteinGoal}g / day &nbsp;<small style={{ color: 'var(--text3)', fontSize: 12 }}>(body weight × 1.6)</small></div>
+            <div className={styles.suggestLabel}>Suggested daily protein from your weight</div>
+            <div className={styles.suggestVal}>
+              {result.proteinGoal}g / day &nbsp;
+              <small style={{ color: 'var(--text3)', fontSize: 12 }}>(body weight × 1.6)</small>
+            </div>
           </div>
         </div>
       )}

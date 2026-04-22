@@ -1,0 +1,63 @@
+.banner {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  animation: slideDown 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+
+.left { flex-shrink: 0; }
+
+.bmiChip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700; white-space: nowrap;
+}
+.catLabel {
+  font-size: 10px; font-weight: 600; opacity: 0.8;
+  padding-left: 4px; border-left: 1px solid currentColor;
+  margin-left: 2px;
+}
+
+.pills {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1;
+}
+.pill {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 14px;
+  background: var(--surface3); border: 1px solid var(--border);
+  font-size: 12px; color: var(--text2); white-space: nowrap;
+}
+.pillIcon { font-size: 12px; }
+.pillVal {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--text);
+}
+.pillVal small { font-size: 9px; font-weight: 400; color: var(--text3); margin-left: 1px; }
+
+.updateBtn {
+  padding: 6px 14px; flex-shrink: 0;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 14px; color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s; touch-action: manipulation; white-space: nowrap;
+}
+.updateBtn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,192,0.06); }
+
+@media (max-width: 520px) {
+  .banner { padding: 10px 12px; gap: 8px; }
+  .catLabel { display: none; }
+  .pill { padding: 4px 8px; }
+  .pillVal small { display: none; }
+}
+
+@media (max-width: 380px) {
+  .pills .pill:nth-child(n+4) { display: none; }
+}

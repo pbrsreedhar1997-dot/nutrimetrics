@@ -192,9 +192,10 @@ app.put('/api/diet-goals', authMiddleware, async (req, res) => {
 
 // ── BMI Log ──────────────────────────────────────────────────────
 app.post('/api/bmi-log', authMiddleware, async (req, res) => {
-  const { bmi, weight_kg, height_cm, category } = req.body;
+  const { bmi, weight_kg, height_cm, category, age, gender } = req.body;
   const doc = await db.bmiLogs.insertAsync({
     userId: req.user.id, bmi, weight_kg, height_cm, category,
+    age: age || null, gender: gender || null,
     logged_at: new Date().toISOString()
   });
   res.json({ id: doc._id });
