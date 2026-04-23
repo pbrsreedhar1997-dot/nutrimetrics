@@ -8,6 +8,7 @@ import ActivityTracker from './components/Activity/ActivityTracker'
 import WorkoutPlans from './components/Workout/WorkoutPlans'
 import DietPlan from './components/DietPlan/DietPlan'
 import StatsBanner from './components/StatsBanner/StatsBanner'
+import Recipes from './components/Recipes/Recipes'
 
 const LS_STATS = 'nm_userstats'
 
@@ -91,6 +92,7 @@ export default function App() {
         {tab === 'workout'  && <WorkoutPlans  userStats={userStats} />}
         {tab === 'plan'     && <DietPlan      userStats={userStats} onGoToBMI={() => setTab('bmi')} />}
         {tab === 'activity' && <ActivityTracker token={token} userStats={userStats} />}
+        {tab === 'recipes'  && <Recipes userStats={userStats} />}
       </div>
     </>
   )

@@ -1,0 +1,256 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Filter card ─────────────────────────────── */
+.filterCard {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  position: relative; overflow: hidden;
+}
+.filterCard::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #34d399, #00e5c0, #60a5fa);
+}
+
+.filterLabel {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px;
+  color: var(--text3); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.autoTag {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
+  background: rgba(0,229,192,0.12); color: var(--accent);
+  border: 1px solid rgba(0,229,192,0.3); border-radius: 10px;
+  padding: 2px 8px; text-transform: uppercase;
+}
+
+/* ── Diet buttons ────────────────────────────── */
+.dietRow { display: flex; gap: 10px; flex-wrap: wrap; }
+.dietBtn {
+  flex: 1; min-width: 100px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 12px 16px;
+  background: var(--surface3); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text2);
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+}
+.dietBtn:hover { border-color: var(--accent); color: var(--text); }
+.dietActive {
+  background: rgba(0,229,192,0.08);
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(0,229,192,0.12);
+}
+.dietIcon { font-size: 18px; }
+
+/* ── Goal chips ──────────────────────────────── */
+.goalRow { display: flex; gap: 8px; flex-wrap: wrap; }
+.goalChip {
+  padding: 8px 16px;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 20px; color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+  white-space: nowrap;
+}
+.goalChip:hover { border-color: var(--accent); color: var(--text); }
+.goalActive {
+  background: var(--grad-accent);
+  border-color: transparent; color: #000;
+  box-shadow: var(--shadow-accent);
+}
+
+/* ── No BMI notice ───────────────────────────── */
+.noStats {
+  margin-top: 12px; padding: 10px 14px;
+  background: rgba(96,165,250,0.06);
+  border: 1px solid rgba(96,165,250,0.2);
+  border-radius: var(--radius-xs);
+  font-size: 12px; color: var(--text2); line-height: 1.6;
+}
+
+/* ── Results header ──────────────────────────── */
+.resultsHeader {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 2px;
+}
+.resultsCount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700; color: var(--text);
+}
+.resultsMeta { font-size: 12px; color: var(--text3); }
+.resultsMeta strong { color: var(--text2); font-weight: 600; }
+
+/* ── Empty state ─────────────────────────────── */
+.empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px;
+  padding: 60px 24px; text-align: center;
+  background: var(--grad-card); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.emptyIcon { font-size: 48px; }
+.emptyTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 700; color: var(--text2);
+}
+.emptyText { font-size: 13px; color: var(--text3); }
+
+/* ── Recipe grid ─────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Recipe card ─────────────────────────────── */
+.card {
+  background: var(--grad-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  transition: border-color 0.22s, box-shadow 0.22s;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.card:hover { border-color: var(--border2); }
+.cardOpen {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px rgba(0,229,192,0.15), var(--shadow);
+}
+
+/* ── Card top ────────────────────────────────── */
+.cardTop {
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.recipeEmoji {
+  font-size: 32px; line-height: 1; flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+.recipeMeta { flex: 1; min-width: 0; }
+.recipeName {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 700; color: var(--text);
+  line-height: 1.3; margin-bottom: 6px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.tagChip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 2px 8px; border-radius: 10px; text-transform: uppercase;
+  background: rgba(0,229,192,0.1); color: var(--accent);
+  border: 1px solid rgba(0,229,192,0.25);
+}
+.timeChip {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  padding: 2px 8px; border-radius: 10px;
+  background: var(--surface3); color: var(--text3);
+  border: 1px solid var(--border);
+}
+.calChip {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  padding: 2px 8px; border-radius: 10px;
+  background: rgba(251,191,36,0.08); color: var(--amber);
+  border: 1px solid rgba(251,191,36,0.2);
+}
+
+/* ── Nutrition row ───────────────────────────── */
+.nutrRow {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px;
+  background: var(--surface3); border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+}
+.nutrItem {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.nutrItem strong { font-size: 12px; }
+.nutrDot { color: var(--border3); font-size: 12px; }
+
+/* ── Expand button ───────────────────────────── */
+.expandBtn {
+  width: 100%; padding: 9px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); color: var(--text2);
+  font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; touch-action: manipulation;
+  text-align: center;
+}
+.expandBtn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,192,0.04); }
+.cardOpen .expandBtn {
+  border-color: rgba(0,229,192,0.3); color: var(--accent);
+  background: rgba(0,229,192,0.06);
+}
+
+/* ── Expanded content ────────────────────────── */
+.expandedContent {
+  display: flex; flex-direction: column; gap: 14px;
+  animation: fadeIn 0.22s ease;
+  border-top: 1px solid var(--border); padding-top: 12px;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
+
+.section { display: flex; flex-direction: column; gap: 8px; }
+.sectionTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3);
+}
+
+/* Ingredients */
+.ingredientList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.ingredient {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; color: var(--text2); line-height: 1.5;
+}
+.bullet {
+  flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--grad-accent); margin-top: 5px;
+}
+
+/* Steps */
+.stepList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.step {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--text2); line-height: 1.55;
+}
+.stepNum {
+  flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(0,229,192,0.1); border: 1px solid rgba(0,229,192,0.3);
+  color: var(--accent); font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+
+/* Tip */
+.tip {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(251,191,36,0.06);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  font-size: 12px; color: var(--text2); line-height: 1.6;
+}
+.tipIcon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 600px) {
+  .filterCard { padding: 16px; }
+  .grid { grid-template-columns: 1fr; }
+  .dietBtn { min-width: 80px; font-size: 12px; padding: 10px 12px; }
+  .card { padding: 14px; }
+  .recipeEmoji { font-size: 26px; }
+  .recipeName { font-size: 13px; }
+}
+
+@media (max-width: 380px) {
+  .dietRow { gap: 6px; }
+  .dietBtn { flex-direction: column; gap: 3px; padding: 8px; font-size: 11px; }
+  .goalRow { gap: 6px; }
+}
