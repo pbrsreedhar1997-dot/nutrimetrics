@@ -51,6 +51,20 @@ export default function WorkoutPlans({ userStats }) {
 
   return (
     <div className={styles.wrap}>
+
+      {/* Intro */}
+      <div className="tab-intro" style={{
+        background:'linear-gradient(135deg,rgba(167,139,250,0.08) 0%,rgba(96,165,250,0.05) 100%)',
+        borderColor:'rgba(167,139,250,0.22)'
+      }}>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,#a78bfa,#60a5fa)'}}/>
+        <div className="tab-intro-icon" style={{background:'rgba(167,139,250,0.12)',border:'1px solid rgba(167,139,250,0.25)'}}>💪</div>
+        <div>
+          <div className="tab-intro-title">Workout Plans</div>
+          <div className="tab-intro-sub">7-day training plans tailored to your fitness goal and level</div>
+        </div>
+      </div>
+
       {/* Goal selector */}
       <div className={styles.selectorCard}>
         <div className={styles.cardTitle}>Choose Your Fitness Goal</div>

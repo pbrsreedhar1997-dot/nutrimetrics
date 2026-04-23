@@ -76,6 +76,19 @@ export default function BMICalculator({ token, onBMIResult, savedStats }) {
 
   return (
     <div className={styles.wrap}>
+      {/* Intro */}
+      <div className="tab-intro" style={{
+        background:'linear-gradient(135deg,rgba(0,229,192,0.07) 0%,rgba(96,165,250,0.05) 100%)',
+        borderColor:'rgba(0,229,192,0.2)'
+      }}>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'var(--grad-accent)'}}/>
+        <div className="tab-intro-icon" style={{background:'rgba(0,229,192,0.12)',border:'1px solid rgba(0,229,192,0.25)'}}>⚖️</div>
+        <div>
+          <div className="tab-intro-title">BMI Calculator</div>
+          <div className="tab-intro-sub">Calculate your Body Mass Index and get personalised nutrition targets</div>
+        </div>
+      </div>
+
       <div className={styles.desktopRow}>
       <div className={styles.card}>
         <div className={styles.cardTitle}>Body Measurements</div>

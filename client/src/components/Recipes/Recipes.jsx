@@ -48,6 +48,19 @@ export default function Recipes({ userStats }) {
   return (
     <div className={styles.wrap}>
 
+      {/* Intro */}
+      <div className="tab-intro" style={{
+        background:'linear-gradient(135deg,rgba(251,191,36,0.07) 0%,rgba(248,113,113,0.05) 100%)',
+        borderColor:'rgba(251,191,36,0.22)'
+      }}>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,#fbbf24,#f87171)'}}/>
+        <div className="tab-intro-icon" style={{background:'rgba(251,191,36,0.12)',border:'1px solid rgba(251,191,36,0.25)'}}>🍽️</div>
+        <div>
+          <div className="tab-intro-title">Healthy Recipes</div>
+          <div className="tab-intro-sub">Simple salads and bowls filtered by your diet type and weight goal</div>
+        </div>
+      </div>
+
       {/* ── Filter card ── */}
       <div className={styles.filterCard}>
         <div className={styles.filterInner}>
