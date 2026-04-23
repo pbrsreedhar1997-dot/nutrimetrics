@@ -1,11 +1,11 @@
-.wrap { display: flex; flex-direction: column; gap: 16px; }
+.wrap { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Hero / Calorie Ring ─────────────────────── */
 .hero {
   background: var(--grad-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: 26px 28px;
   position: relative; overflow: hidden;
 }
 .hero::before {
@@ -15,8 +15,13 @@
 }
 
 .ringRow {
-  display: flex; align-items: center; gap: 24px;
+  display: flex; align-items: center; gap: 28px;
   flex-wrap: wrap;
+}
+
+@media (min-width: 760px) {
+  .hero { padding: 28px 32px; }
+  .ringRow { gap: 36px; }
 }
 
 /* SVG Ring */

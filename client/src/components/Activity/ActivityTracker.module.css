@@ -1,10 +1,10 @@
-.wrap { display: flex; flex-direction: column; gap: 16px; }
+.wrap { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Hero ───────────────────────────────────── */
 .hero {
   background: var(--grad-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 22px;
+  border-radius: var(--radius); padding: 26px 28px;
   position: relative; overflow: hidden;
 }
 .hero::before {
@@ -14,8 +14,11 @@
 }
 
 .heroTop {
-  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
   justify-content: center;
+}
+@media (min-width: 700px) {
+  .heroTop { justify-content: flex-start; }
 }
 
 /* ── Step Ring ──────────────────────────────── */
@@ -267,9 +270,12 @@
 .howCard {
   background: var(--grad-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 22px;
+  border-radius: var(--radius); padding: 24px 28px;
 }
 .howGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (min-width: 760px) {
+  .howGrid { grid-template-columns: repeat(3, 1fr); }
+}
 .howItem {
   padding: 14px; background: var(--surface2);
   border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -283,7 +289,7 @@
 
 /* ── Mobile ──────────────────────────────────── */
 @media (max-width: 640px) {
-  .hero, .chartCard, .tipsCard, .howCard { padding: 16px; }
+  .hero, .chartCard, .tipsCard, .howCard { padding: 18px 16px; }
   .heroTop { gap: 16px; }
   .ringWrap { width: 140px; height: 140px; }
   .ring { width: 140px; height: 140px; }

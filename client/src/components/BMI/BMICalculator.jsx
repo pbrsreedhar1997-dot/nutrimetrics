@@ -76,6 +76,7 @@ export default function BMICalculator({ token, onBMIResult, savedStats }) {
 
   return (
     <div className={styles.wrap}>
+      <div className={styles.desktopRow}>
       <div className={styles.card}>
         <div className={styles.cardTitle}>Body Measurements</div>
 
@@ -183,6 +184,7 @@ export default function BMICalculator({ token, onBMIResult, savedStats }) {
           </div>
         </div>
       )}
+      </div>{/* /desktopRow */}
     </div>
   )
 }

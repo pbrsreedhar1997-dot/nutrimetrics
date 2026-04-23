@@ -1,10 +1,13 @@
-.wrap { display: flex; flex-direction: column; gap: 16px; }
+.wrap { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Selector card ────────────────────────── */
 .selectorCard, .weekCard {
   background: var(--grad-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 22px;
+  border-radius: var(--radius); padding: 24px 28px;
+}
+@media (min-width: 760px) {
+  .selectorCard, .weekCard { padding: 28px 32px; }
 }
 .cardTitle {
   font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
@@ -159,7 +162,7 @@
 .dayHeaderLabel { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 800; color: var(--text); }
 .dayHeaderSub { font-size: 12px; color: var(--text3); margin-top: 2px; }
 
-.exGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 14px; }
+.exGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px; }
 
 .restCard { padding: 48px 20px; text-align: center; color: var(--text3); }
 .restIcon { font-size: 48px; margin-bottom: 14px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2)); }

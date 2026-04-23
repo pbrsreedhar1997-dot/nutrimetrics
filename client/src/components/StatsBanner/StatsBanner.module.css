@@ -1,10 +1,10 @@
 .banner {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 10px 16px;
+  padding: 11px 18px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   animation: slideDown 0.28s cubic-bezier(0.22,1,0.36,1);
 }
 @keyframes slideDown {

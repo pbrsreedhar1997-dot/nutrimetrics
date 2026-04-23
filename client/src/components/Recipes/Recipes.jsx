@@ -48,39 +48,46 @@ export default function Recipes({ userStats }) {
   return (
     <div className={styles.wrap}>
 
-      {/* ── Diet selector ── */}
+      {/* ── Filter card ── */}
       <div className={styles.filterCard}>
-        <div className={styles.filterLabel}>Diet Type</div>
-        <div className={styles.dietRow}>
-          {DIET_OPTIONS.map(d => (
-            <button
-              key={d.id}
-              className={`${styles.dietBtn} ${dietPref === d.id ? styles.dietActive : ''}`}
-              onClick={() => chooseDiet(d.id)}
-            >
-              <span className={styles.dietIcon}>{d.icon}</span>
-              <span>{d.label}</span>
-            </button>
-          ))}
-        </div>
+        <div className={styles.filterInner}>
+          {/* Diet type section */}
+          <div className={styles.filterSection}>
+            <div className={styles.filterLabel}>Diet Type</div>
+            <div className={styles.dietRow}>
+              {DIET_OPTIONS.map(d => (
+                <button
+                  key={d.id}
+                  className={`${styles.dietBtn} ${dietPref === d.id ? styles.dietActive : ''}`}
+                  onClick={() => chooseDiet(d.id)}
+                >
+                  <span className={styles.dietIcon}>{d.icon}</span>
+                  <span>{d.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* ── Goal selector ── */}
-        <div className={styles.filterLabel} style={{ marginTop: 16 }}>
-          Goal
-          {bmiAutoGoal && !goalOverride && (
-            <span className={styles.autoTag}>auto from BMI</span>
-          )}
-        </div>
-        <div className={styles.goalRow}>
-          {GOAL_OPTIONS.map(g => (
-            <button
-              key={g.id}
-              className={`${styles.goalChip} ${activeGoal === g.id ? styles.goalActive : ''}`}
-              onClick={() => setGoalOverride(prev => prev === g.id ? null : g.id)}
-            >
-              {g.icon} {g.label}
-            </button>
-          ))}
+          {/* Goal section */}
+          <div className={styles.filterSection}>
+            <div className={styles.filterLabel}>
+              Goal
+              {bmiAutoGoal && !goalOverride && (
+                <span className={styles.autoTag}>auto from BMI</span>
+              )}
+            </div>
+            <div className={styles.goalRow}>
+              {GOAL_OPTIONS.map(g => (
+                <button
+                  key={g.id}
+                  className={`${styles.goalChip} ${activeGoal === g.id ? styles.goalActive : ''}`}
+                  onClick={() => setGoalOverride(prev => prev === g.id ? null : g.id)}
+                >
+                  {g.icon} {g.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* No BMI notice */}
