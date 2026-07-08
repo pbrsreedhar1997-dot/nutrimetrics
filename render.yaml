@@ -10,7 +10,8 @@ services:
         generateValue: true
       - key: NODE_ENV
         value: production
-    disk:
-      name: nutrimetrics-data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
+      # Server-side only — full DB access, never exposed to the frontend.
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
