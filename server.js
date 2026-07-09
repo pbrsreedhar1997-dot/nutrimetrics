@@ -29,7 +29,16 @@ const { pushToUser } = createSocketServer(httpServer, JWT_SECRET);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-// APK download (kept outside public/ so the client build's emptyOutDir doesn't wipe it)
+
+// APK download — explicit route with an attachment filename + Android package
+// MIME so mobile browsers save it as a real installable .apk (otherwise some
+// treat it as a generic document with no install option).
+app.get('/downloads/NutriMetrics.apk', (req, res) => {
+  res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+  res.setHeader('Content-Disposition', 'attachment; filename="NutriMetrics.apk"');
+  res.sendFile(path.join(__dirname, 'downloads', 'NutriMetrics.apk'));
+});
+// (kept outside public/ so the client build's emptyOutDir doesn't wipe it)
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
 function authMiddleware(req, res, next) {
