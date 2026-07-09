@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import ActivityTracker from '../Activity/ActivityTracker'
+import StepSync from '../Activity/StepSync'
 import WorkoutPlans from '../Workout/WorkoutPlans'
 import styles from './Hubs.module.css'
 
@@ -18,7 +18,7 @@ export default function ActivityHub({ token, userStats }) {
             onClick={() => setTab(t.id)}>{t.label}</button>
         ))}
       </div>
-      {tab === 'steps'    && <ActivityTracker token={token} userStats={userStats} />}
+      {tab === 'steps'    && <StepSync token={token} userStats={userStats} />}
       {tab === 'workouts' && <WorkoutPlans userStats={userStats} />}
     </div>
   )

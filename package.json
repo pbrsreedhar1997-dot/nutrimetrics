@@ -17,6 +17,7 @@
     "@capacitor/core": "^8.4.1",
     "@supabase/supabase-js": "^2.110.1",
     "bcryptjs": "^2.4.3",
+    "capacitor-health": "^8.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^4.18.2",

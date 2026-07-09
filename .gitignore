@@ -7,6 +7,12 @@ client/dist/
 .DS_Store
 *.log
 
-# Capacitor native project (regenerate with: npx cap add android)
-android/
+# Capacitor Android project — committed (has custom manifest/minSdk), but
+# ignore build outputs and machine-specific config.
+android/.gradle/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/build/
+android/local.properties
+android/.idea/
 .gradle/
