@@ -74,3 +74,17 @@
   display: flex; align-items: center; justify-content: center;
   background: var(--grad-accent); color: #000; font-weight: 800; font-size: 16px;
 }
+
+/* ── Streak chip + ring completion ── */
+.streak {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,159,67,0.18), rgba(250,46,90,0.14));
+  border: 1px solid rgba(255,159,67,0.4);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 13px; color: #ff9f43;
+  white-space: nowrap;
+}
+.ringFull .ringVal { color: var(--accent); }
+.ringFull { animation: ringPop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes ringPop { 0% { transform: scale(1); } 55% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .ringFull { animation: none; } }

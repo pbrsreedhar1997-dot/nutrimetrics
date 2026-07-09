@@ -8,25 +8,45 @@ function Ring({ value, max, label, unit, color, size = 116 }) {
   const pct = max > 0 ? Math.min(1, value / max) : 0
   const r = (size - 14) / 2
   const c = 2 * Math.PI * r
+  const full = pct >= 1
+  // Animate the ring filling in on mount (Apple-style earned progress).
+  const [draw, setDraw] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => setDraw(pct), 120)
+    return () => clearTimeout(t)
+  }, [pct])
   return (
-    <div className={styles.ring}>
+    <div className={`${styles.ring} ${full ? styles.ringFull : ''}`}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--surface3)" strokeWidth="9" />
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="9"
-          strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct)}
-          transform={`rotate(-90 ${size/2} ${size/2})`} style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+          strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - draw)}
+          transform={`rotate(-90 ${size/2} ${size/2})`}
+          style={{ transition: 'stroke-dashoffset 0.9s cubic-bezier(0.22,1,0.36,1)', filter: full ? `drop-shadow(0 0 6px ${color})` : 'none' }} />
       </svg>
       <div className={styles.ringInner}>
         <div className={styles.ringVal}>{value.toLocaleString()}</div>
-        <div className={styles.ringUnit}>{unit}</div>
+        <div className={styles.ringUnit}>{full ? '✓ done' : unit}</div>
       </div>
       <div className={styles.ringLabel}>{label}</div>
     </div>
   )
 }
 
+// Consecutive days (ending today or yesterday) with any recorded steps.
+function computeStreak(logs) {
+  const byDate = new Set((logs || []).filter(l => (l.steps || 0) > 0).map(l => l.date))
+  let streak = 0
+  const d = new Date()
+  // allow the streak to still count if today isn't logged yet
+  if (!byDate.has(d.toISOString().split('T')[0])) d.setDate(d.getDate() - 1)
+  while (byDate.has(d.toISOString().split('T')[0])) { streak++; d.setDate(d.getDate() - 1) }
+  return streak
+}
+
 export default function Dashboard({ token, username, userStats, onNavigate }) {
   const [activity, setActivity] = useState(null)
+  const [streak, setStreak]     = useState(0)
   const [diet, setDiet]         = useState(null)
   const [proteinToday, setProteinToday] = useState(0)
 
@@ -35,6 +55,7 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
     apiCall('GET', '/activity-log', null, token).then(r => {
       const t = (r.logs || []).find(l => l.date === TODAY()) || (r.logs || [])[0] || null
       setActivity(t)
+      setStreak(computeStreak(r.logs))
     })
     apiCall('GET', '/diet-log', null, token).then(r => setDiet(r))
     apiCall('GET', '/protein-log', null, token).then(r => {
@@ -70,7 +91,9 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
           <div className={styles.greeting}>{greeting},</div>
           <div className={styles.name}>{username} 👋</div>
         </div>
-        <div className={styles.date}>{new Date().toLocaleDateString('en', { weekday: 'long', month: 'short', day: 'numeric' })}</div>
+        {streak > 0
+          ? <div className={styles.streak} title={`${streak}-day activity streak`}>🔥 {streak} day{streak > 1 ? 's' : ''}</div>
+          : <div className={styles.date}>{new Date().toLocaleDateString('en', { weekday: 'long', month: 'short', day: 'numeric' })}</div>}
       </div>
 
       <div className={styles.rings}>

@@ -65,11 +65,30 @@ function Post({ token, post, onChanged }) {
   const [showComments, setShowComments] = useState(false)
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
+  // Optimistic like state — fills instantly, reconciles with the server after.
+  const [liked, setLiked]     = useState(!!post.liked_by_me)
+  const [likeCount, setLikeCount] = useState(post.like_count || 0)
+  const [burst, setBurst]     = useState(false)
 
-  async function toggleLike() {
-    if (post.liked_by_me) await apiCall('DELETE', `/posts/${post.id}/like`, null, token)
-    else await apiCall('POST', `/posts/${post.id}/like`, {}, token)
-    onChanged()
+  async function setLike(next) {
+    if (next === liked) return
+    setLiked(next)
+    setLikeCount(c => c + (next ? 1 : -1))
+    if (navigator.vibrate) navigator.vibrate(10)
+    try {
+      await apiCall(next ? 'POST' : 'DELETE', `/posts/${post.id}/like`, next ? {} : null, token)
+    } catch {
+      setLiked(!next); setLikeCount(c => c + (next ? -1 : 1)) // revert on failure
+    }
+  }
+
+  function toggleLike() { setLike(!liked) }
+
+  // Instagram-style double-tap to like: only ever likes (never unlikes) + heart burst.
+  function onDoubleTap() {
+    setBurst(true)
+    setTimeout(() => setBurst(false), 900)
+    setLike(true)
   }
 
   async function openComments() {
@@ -93,16 +112,19 @@ function Post({ token, post, onChanged }) {
   return (
     <div className={styles.postCard}>
       <div className={styles.postAuthor}>{post.author}</div>
-      {post.kind === 'activity' ? (
-        <div className={styles.postActivity}>
-          🚶 <strong>{post.steps?.toLocaleString()}</strong> steps · {post.distance_km} km · {Math.round(post.calories_burned || 0)} kcal
-        </div>
-      ) : (
-        <div className={styles.postContent}>{post.content}</div>
-      )}
+      <div className={styles.postBody} onDoubleClick={onDoubleTap}>
+        {post.kind === 'activity' ? (
+          <div className={styles.postActivity}>
+            🚶 <strong>{post.steps?.toLocaleString()}</strong> steps · {post.distance_km} km · {Math.round(post.calories_burned || 0)} kcal
+          </div>
+        ) : (
+          <div className={styles.postContent}>{post.content}</div>
+        )}
+        {burst && <span className={styles.heartBurst}>❤</span>}
+      </div>
       <div className={styles.postActions}>
-        <button className={post.liked_by_me ? styles.liked : ''} onClick={toggleLike}>
-          ❤ {post.like_count}
+        <button className={liked ? styles.liked : ''} onClick={toggleLike}>
+          <span className={liked ? styles.heartPop : ''}>{liked ? '❤' : '🤍'}</span> {likeCount}
         </button>
         <button onClick={openComments}>💬 {post.comment_count}</button>
       </div>
