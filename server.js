@@ -617,6 +617,101 @@ app.post('/api/messages/:userId', authMiddleware, async (req, res) => {
   res.json({ id: doc.id, message: 'Sent' });
 });
 
+// ── Challenges ───────────────────────────────────────────────────
+app.post('/api/challenges', authMiddleware, async (req, res) => {
+  const name = String(req.body.name || '').trim();
+  const { startDate, endDate, groupId } = req.body;
+  if (!name || !startDate || !endDate) return res.status(400).json({ error: 'Name, start and end date required' });
+
+  const { data: chal, error } = await supabase
+    .from('challenges')
+    .insert({ name, start_date: startDate, end_date: endDate, created_by: req.user.id, group_id: groupId || null })
+    .select().single();
+  if (error) { console.error('challenge insert error:', error.message); return res.status(500).json({ error: 'Could not create challenge' }); }
+
+  // Auto-enroll the creator, plus all group members if it's a group challenge.
+  let memberIds = [req.user.id];
+  if (groupId) {
+    const { data: gm } = await supabase.from('group_members').select('user_id').eq('group_id', groupId);
+    memberIds = [...new Set([req.user.id, ...(gm || []).map(m => m.user_id)])];
+  }
+  await supabase.from('challenge_participants').insert(memberIds.map(uid => ({ challenge_id: chal.id, user_id: uid })));
+
+  for (const id of memberIds) if (id !== req.user.id) pushToUser(id, { type: 'challenge_invite', challenge: { id: chal.id, name } });
+  res.json({ id: chal.id, message: 'Challenge created' });
+});
+
+app.post('/api/challenges/:id/join', authMiddleware, async (req, res) => {
+  const { error } = await supabase.from('challenge_participants').insert({ challenge_id: req.params.id, user_id: req.user.id });
+  if (error && error.code !== '23505') return res.status(500).json({ error: 'Could not join' });
+  res.json({ message: 'Joined' });
+});
+
+app.post('/api/challenges/:id/invite', authMiddleware, async (req, res) => {
+  const targetUsername = String(req.body.username || '').trim();
+  const { data: me } = await supabase
+    .from('challenge_participants').select('id').eq('challenge_id', req.params.id).eq('user_id', req.user.id).maybeSingle();
+  if (!me) return res.status(403).json({ error: 'Join the challenge first' });
+
+  const { data: target } = await supabase.from('profiles').select('id, username').ilike('username', targetUsername).maybeSingle();
+  if (!target) return res.status(404).json({ error: 'User not found' });
+
+  const friendIds = await friendIdsOf(req.user.id);
+  if (!friendIds.includes(target.id)) return res.status(400).json({ error: 'You can only invite friends' });
+
+  const { error } = await supabase.from('challenge_participants').insert({ challenge_id: req.params.id, user_id: target.id });
+  if (error && error.code !== '23505') return res.status(500).json({ error: 'Could not invite' });
+
+  const { data: chal } = await supabase.from('challenges').select('name').eq('id', req.params.id).maybeSingle();
+  pushToUser(target.id, { type: 'challenge_invite', challenge: { id: req.params.id, name: chal?.name } });
+  res.json({ message: 'Invited' });
+});
+
+app.get('/api/challenges', authMiddleware, async (req, res) => {
+  const { data: parts } = await supabase.from('challenge_participants').select('challenge_id').eq('user_id', req.user.id);
+  const ids = (parts || []).map(p => p.challenge_id);
+  if (!ids.length) return res.json({ challenges: [] });
+
+  const { data: chals } = await supabase.from('challenges').select('*').in('id', ids).order('end_date', { ascending: false });
+  const todayStr = today();
+  res.json({
+    challenges: (chals || []).map(c => ({
+      ...c,
+      status: todayStr < c.start_date ? 'upcoming' : todayStr > c.end_date ? 'ended' : 'active',
+    })),
+  });
+});
+
+app.get('/api/challenges/:id', authMiddleware, async (req, res) => {
+  const { data: chal } = await supabase.from('challenges').select('*').eq('id', req.params.id).maybeSingle();
+  if (!chal) return res.status(404).json({ error: 'Challenge not found' });
+
+  const { data: parts } = await supabase.from('challenge_participants').select('user_id').eq('challenge_id', chal.id);
+  const participantIds = (parts || []).map(p => p.user_id);
+  if (!participantIds.includes(req.user.id)) return res.status(403).json({ error: 'Not part of this challenge' });
+
+  const [profiles, { data: logs }] = await Promise.all([
+    profilesByIds(participantIds),
+    supabase.from('activity_logs').select('user_id, steps')
+      .in('user_id', participantIds).gte('date', chal.start_date).lte('date', chal.end_date),
+  ]);
+
+  const totals = {};
+  for (const id of participantIds) totals[id] = 0;
+  for (const l of (logs || [])) totals[l.user_id] = (totals[l.user_id] || 0) + (l.steps || 0);
+
+  const leaderboard = participantIds
+    .map(id => ({ id, username: profiles.get(id)?.username || 'Unknown', steps: totals[id] || 0 }))
+    .sort((a, b) => b.steps - a.steps)
+    .map((row, i) => ({ ...row, rank: i + 1, isMe: row.id === req.user.id }));
+
+  const todayStr = today();
+  res.json({
+    challenge: { ...chal, status: todayStr < chal.start_date ? 'upcoming' : todayStr > chal.end_date ? 'ended' : 'active' },
+    leaderboard,
+  });
+});
+
 // ── Serve frontend ───────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

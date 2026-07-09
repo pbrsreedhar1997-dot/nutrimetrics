@@ -1,0 +1,17 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+.subTabs {
+  display: flex; gap: 6px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 5px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.subTabs::-webkit-scrollbar { display: none; }
+.subTab {
+  flex: 1; padding: 10px 16px; border: none; border-radius: 9px;
+  background: transparent; color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s; letter-spacing: 0.2px;
+}
+.subTab:hover { color: var(--text2); background: var(--surface3); }
+.subTab.active { background: var(--grad-accent); color: #000; box-shadow: 0 2px 14px rgba(0,229,192,0.28); }

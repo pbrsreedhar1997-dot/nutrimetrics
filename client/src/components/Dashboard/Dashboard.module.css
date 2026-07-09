@@ -1,0 +1,57 @@
+.wrap { display: flex; flex-direction: column; gap: 20px; }
+
+.hero {
+  text-align: center; padding: 48px 24px;
+  background: var(--grad-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; margin-bottom: 10px; }
+.hero p { color: var(--text2); font-size: 14px; max-width: 380px; margin: 0 auto; }
+
+.header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.greeting { font-size: 14px; color: var(--text3); }
+.name { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); }
+.date { font-size: 12px; color: var(--text3); text-align: right; padding-top: 4px; }
+
+/* ── Rings ─────────────────────────── */
+.rings {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  padding: 22px 12px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.ring { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ringInner {
+  position: absolute; top: 0; left: 0; right: 0; height: 116px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.ringVal { font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 800; color: var(--text); line-height: 1; }
+.ringUnit { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+.ringLabel { font-size: 12px; font-weight: 700; color: var(--text2); }
+
+/* ── Quick actions ─────────────────── */
+.quickGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.quickCard {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  padding: 18px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: left;
+}
+.quickCard:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-accent); }
+.quickIcon { font-size: 26px; margin-bottom: 4px; }
+.quickLabel { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+.quickSub { font-size: 12px; color: var(--text3); }
+
+/* ── BMI strip ─────────────────────── */
+.bmiStrip {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; color: var(--text2);
+}
+.bmiStrip strong { font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: var(--text); }
+.bmiCat { margin-left: auto; font-size: 12px; color: var(--accent); font-weight: 700; }
+
+@media (max-width: 560px) {
+  .rings { grid-template-columns: repeat(2, 1fr); gap: 18px 12px; }
+}

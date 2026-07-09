@@ -172,7 +172,9 @@ export default function ActivityTracker({ token, userStats }) {
     timerRef.current = setInterval(() => {
       setElapsed(Math.round((Date.now() - startTs.current) / 1000))
     }, 1000)
-    saveRef.current = setInterval(() => saveTodayLog(), 30000)
+    // Sync steps to the server every ~2s while tracking so the live count is
+    // persisted continuously (and reflected in the dashboard / challenges).
+    saveRef.current = setInterval(() => saveTodayLog({ silent: true }), 2000)
   }
 
   function stopTracking() {
@@ -189,19 +191,22 @@ export default function ActivityTracker({ token, userStats }) {
     inPeak.current = false; lastStep.current = 0
   }
 
-  async function saveTodayLog() {
+  async function saveTodayLog({ silent = false } = {}) {
     const s    = stepsRef.current
     const dist = +(s * STRIDE_M / 1000).toFixed(2)
     const cal  = stepsToCalories(s, weightKg)
     const mins = Math.round(elapsed / 60)
     const payload = { date: TODAY(), steps: s, distanceKm: dist, caloriesBurned: cal, activeMinutes: mins, stepGoal }
-    if (token) {
-      fetch(`${API}/activity-log`, { method: 'POST', headers, body: JSON.stringify(payload) })
-        .then(r => r.json())
-        .then(() => fetch(`${API}/activity-log`, { headers }).then(r => r.json())
-          .then(d => setHistory(d.logs || [])).catch(() => {}))
-        .catch(() => {})
-    }
+    if (!token) return
+    try {
+      await fetch(`${API}/activity-log`, { method: 'POST', headers, body: JSON.stringify(payload) })
+      // The 2s live sync just persists; only refresh the 7-day history on the
+      // heavier saves (stop / manual) to avoid a fetch every 2 seconds.
+      if (!silent) {
+        const d = await fetch(`${API}/activity-log`, { headers }).then(r => r.json())
+        setHistory(d.logs || [])
+      }
+    } catch { /* offline — will retry on next tick */ }
   }
 
   useEffect(() => () => {

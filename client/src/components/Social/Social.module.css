@@ -138,3 +138,33 @@
   padding: 11px 20px; background: var(--grad-accent); border: none;
   border-radius: var(--radius-sm); color: #000; font-weight: 700; cursor: pointer;
 }
+
+/* ── Challenges ───────────────────────────── */
+.chalHead { display: flex; align-items: center; gap: 10px; }
+.chalHead h3 { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 17px; }
+.chalDates { font-size: 12px; color: var(--text3); }
+.chalStatus {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 3px 9px; border-radius: 20px;
+}
+.status_active   { background: rgba(0,229,192,0.15); color: var(--accent); }
+.status_upcoming { background: rgba(91,156,246,0.15); color: #5b9cf6; }
+.status_ended    { background: var(--surface3); color: var(--text3); }
+
+.leaderboard { display: flex; flex-direction: column; gap: 6px; }
+.lbRow {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.lbMe { border-color: var(--accent); background: rgba(0,229,192,0.06); }
+.lbRank { font-size: 16px; font-weight: 800; min-width: 32px; }
+.lbName { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+.lbSteps { font-family: 'Space Grotesk', sans-serif; font-weight: 800; color: var(--accent); }
+
+.dateRow { display: flex; gap: 12px; }
+.dateRow label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text3); flex: 1; }
+.dateRow input {
+  padding: 9px 11px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 13px; font-family: inherit;
+}

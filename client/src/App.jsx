@@ -3,20 +3,16 @@ import { useAuth } from './hooks/useAuth'
 import { useSocket } from './hooks/useSocket'
 import AuthModal from './components/Auth/AuthModal'
 import Header from './components/Header/Header'
-import BMICalculator from './components/BMI/BMICalculator'
-import DietTracker from './components/DietTracker/DietTracker'
-import ActivityTracker from './components/Activity/ActivityTracker'
-import WorkoutPlans from './components/Workout/WorkoutPlans'
-import DietPlan from './components/DietPlan/DietPlan'
-import StatsBanner from './components/StatsBanner/StatsBanner'
-import Recipes from './components/Recipes/Recipes'
+import Dashboard from './components/Dashboard/Dashboard'
+import ActivityHub from './components/Hubs/ActivityHub'
+import NutritionHub from './components/Hubs/NutritionHub'
 import Social from './components/Social/Social'
 
 const LS_STATS = 'nm_userstats'
 
 export default function App() {
   const { token, username, login, logout, isLoggedIn } = useAuth()
-  const [tab, setTab]       = useState('bmi')
+  const [tab, setTab]       = useState('home')
   const [authOpen, setAuthOpen] = useState(false)
   const [theme, setTheme]   = useState(() => localStorage.getItem('nm_theme') || 'dark')
   const [hasNotif, setHasNotif] = useState(false)
@@ -86,8 +82,6 @@ export default function App() {
     localStorage.setItem(LS_STATS, JSON.stringify(stats))
   }
 
-  const showBanner = tab !== 'bmi' && userStats
-
   return (
     <>
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onLogin={login} />
@@ -100,17 +94,10 @@ export default function App() {
           hasNotif={hasNotif}
         />
 
-        {showBanner && (
-          <StatsBanner userStats={userStats} onGoToBMI={() => setTab('bmi')} />
-        )}
-
-        {tab === 'bmi'      && <BMICalculator token={token} onBMIResult={handleBMIResult} savedStats={userStats} />}
-        {tab === 'diet'     && <DietTracker   token={token} userStats={userStats} />}
-        {tab === 'workout'  && <WorkoutPlans  userStats={userStats} />}
-        {tab === 'plan'     && <DietPlan      userStats={userStats} onGoToBMI={() => setTab('bmi')} />}
-        {tab === 'activity' && <ActivityTracker token={token} userStats={userStats} />}
-        {tab === 'recipes'  && <Recipes userStats={userStats} />}
-        {tab === 'social'   && <Social token={token} />}
+        {tab === 'home'      && <Dashboard    token={token} username={username} userStats={userStats} onNavigate={handleTabChange} />}
+        {tab === 'activity'  && <ActivityHub  token={token} userStats={userStats} />}
+        {tab === 'nutrition' && <NutritionHub token={token} userStats={userStats} onBMIResult={handleBMIResult} />}
+        {tab === 'social'    && <Social       token={token} />}
       </div>
     </>
   )

@@ -3,14 +3,16 @@ import Feed from './Feed'
 import Friends from './Friends'
 import Groups from './Groups'
 import Messages from './Messages'
+import Challenges from './Challenges'
 import { useSocket } from '../../hooks/useSocket'
 import styles from './Social.module.css'
 
 const SUB_TABS = [
-  { id: 'feed',     label: 'Feed' },
-  { id: 'friends',  label: 'Friends' },
-  { id: 'groups',   label: 'Groups' },
-  { id: 'messages', label: 'Messages' },
+  { id: 'feed',       label: 'Feed' },
+  { id: 'challenges', label: '🏆 Challenges' },
+  { id: 'friends',    label: 'Friends' },
+  { id: 'groups',     label: 'Groups' },
+  { id: 'messages',   label: 'Messages' },
 ]
 
 export default function Social({ token }) {
@@ -32,10 +34,11 @@ export default function Social({ token }) {
         ))}
       </div>
 
-      {tab === 'feed'     && <Feed     token={token} socket={socket} />}
-      {tab === 'friends'  && <Friends  token={token} socket={socket} />}
-      {tab === 'groups'   && <Groups   token={token} socket={socket} />}
-      {tab === 'messages' && <Messages token={token} socket={socket} />}
+      {tab === 'feed'       && <Feed       token={token} socket={socket} />}
+      {tab === 'challenges' && <Challenges token={token} socket={socket} />}
+      {tab === 'friends'    && <Friends    token={token} socket={socket} />}
+      {tab === 'groups'     && <Groups     token={token} socket={socket} />}
+      {tab === 'messages'   && <Messages   token={token} socket={socket} />}
     </div>
   )
 }
