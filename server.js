@@ -29,6 +29,8 @@ const { pushToUser } = createSocketServer(httpServer, JWT_SECRET);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+// APK download (kept outside public/ so the client build's emptyOutDir doesn't wipe it)
+app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];

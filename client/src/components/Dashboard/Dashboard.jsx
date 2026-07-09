@@ -110,6 +110,15 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
           <span className={styles.bmiCat}>{userStats.category}</span>
         </div>
       )}
+
+      <a className={styles.appBanner} href="/downloads/NutriMetrics.apk" download>
+        <span className={styles.appIcon}>🤖</span>
+        <div className={styles.appText}>
+          <div className={styles.appTitle}>Get the Android app</div>
+          <div className={styles.appSub}>Install NutriMetrics on your phone · APK</div>
+        </div>
+        <span className={styles.appArrow}>↓</span>
+      </a>
     </div>
   )
 }
