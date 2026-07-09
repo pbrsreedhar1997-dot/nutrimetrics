@@ -131,6 +131,7 @@
 .tabs::-webkit-scrollbar { display: none; }
 
 .tabBtn {
+  position: relative;
   flex: 1;
   display: flex; align-items: center; justify-content: center; gap: 7px;
   padding: 10px 16px;
@@ -144,6 +145,13 @@
   white-space: nowrap;
   touch-action: manipulation;
 }
+.notifBadge {
+  position: absolute; top: 5px; right: 8px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 2px var(--surface2);
+}
+.navIcon .notifBadge { top: -2px; right: -5px; position: absolute; }
 .tabBtn:hover { color: var(--text2); background: var(--surface3); }
 .tabBtn.active {
   background: var(--grad-accent);
@@ -190,6 +198,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .navIcon {
+  position: relative;
   display: flex; align-items: center; justify-content: center;
   color: var(--text3);
   transition: color 0.18s, transform 0.18s;

@@ -1,0 +1,140 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+.subTabs {
+  display: flex; gap: 6px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 5px;
+  overflow-x: auto;
+}
+.subTab {
+  flex: 1; padding: 9px 14px; border: none; border-radius: 8px;
+  background: transparent; color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s;
+}
+.subTab:hover { color: var(--text2); background: var(--surface3); }
+.subTab.active { background: var(--grad-accent); color: #000; box-shadow: 0 2px 14px rgba(0,229,192,0.28); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.loading, .empty {
+  text-align: center; color: var(--text3); padding: 24px; font-size: 13.5px;
+}
+
+.msg { font-size: 13px; color: var(--accent); }
+
+.section { display: flex; flex-direction: column; gap: 8px; }
+.section h4 {
+  font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3);
+  margin-bottom: 2px;
+}
+
+.addForm { display: flex; gap: 8px; }
+.addForm input {
+  flex: 1; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 14px;
+}
+.addForm input:focus { outline: none; border-color: var(--accent); }
+.addForm button {
+  padding: 11px 18px; background: var(--grad-accent); border: none;
+  border-radius: var(--radius-sm); color: #000; font-weight: 700; font-size: 13px;
+  cursor: pointer; white-space: nowrap;
+}
+
+.row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 14px; color: var(--text);
+}
+.rowActions { display: flex; gap: 8px; }
+.rowActions button, .row .ghost {
+  padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--surface3); color: var(--text2); font-size: 12px; font-weight: 700;
+  cursor: pointer;
+}
+.rowActions button:first-child { background: var(--grad-accent); color: #000; border: none; }
+.ghost { background: transparent !important; }
+.roleTag { font-size: 11px; color: var(--text3); text-transform: uppercase; }
+.preview { font-size: 12px; color: var(--text3); }
+.backBtn {
+  align-self: flex-start; background: none; border: none; color: var(--accent);
+  font-size: 13px; font-weight: 700; cursor: pointer; padding: 0;
+}
+
+/* ── Composer ─────────────────────────────── */
+.composer {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.composerModes { display: flex; gap: 6px; }
+.composerModes button {
+  padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--surface3); color: var(--text2); font-size: 12.5px; font-weight: 700;
+  cursor: pointer;
+}
+.composerModes button.active { background: var(--grad-accent); color: #000; border: none; }
+.composer textarea, .composer select {
+  width: 100%; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; resize: vertical;
+}
+.postBtn {
+  align-self: flex-end; padding: 9px 20px; background: var(--grad-accent); border: none;
+  border-radius: 8px; color: #000; font-weight: 700; font-size: 13px; cursor: pointer;
+}
+.postBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Post card ────────────────────────────── */
+.postCard {
+  padding: 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); display: flex; flex-direction: column; gap: 8px;
+}
+.postAuthor { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; color: var(--accent); }
+.postActivity { font-size: 14px; color: var(--text); }
+.postContent { font-size: 14px; color: var(--text); line-height: 1.5; }
+.postMeta { font-size: 12px; color: var(--text3); }
+.postActions { display: flex; gap: 16px; }
+.postActions button {
+  background: none; border: none; color: var(--text3); font-size: 13px;
+  font-weight: 700; cursor: pointer; padding: 0;
+}
+.postActions button.liked { color: var(--red); }
+
+.commentBox { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border); padding-top: 8px; }
+.comment { font-size: 13px; color: var(--text2); }
+.commentForm { display: flex; gap: 6px; margin-top: 4px; }
+.commentForm input {
+  flex: 1; padding: 7px 10px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text); font-size: 13px;
+}
+.commentForm button {
+  padding: 7px 14px; background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 7px; color: var(--text2); font-size: 12px; font-weight: 700; cursor: pointer;
+}
+
+/* ── Messages ─────────────────────────────── */
+.thread { display: flex; flex-direction: column; gap: 12px; height: 60vh; }
+.thread h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; margin: 0; }
+.threadMessages {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+  padding: 8px; background: var(--surface2); border-radius: var(--radius-sm);
+}
+.bubble {
+  max-width: 75%; padding: 9px 13px; border-radius: 14px; font-size: 14px; line-height: 1.4;
+}
+.bubbleMe   { align-self: flex-end; background: var(--grad-accent); color: #000; }
+.bubbleThem { align-self: flex-start; background: var(--surface3); color: var(--text); }
+.sendForm { display: flex; gap: 8px; }
+.sendForm input {
+  flex: 1; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 14px;
+}
+.sendForm button {
+  padding: 11px 20px; background: var(--grad-accent); border: none;
+  border-radius: var(--radius-sm); color: #000; font-weight: 700; cursor: pointer;
+}

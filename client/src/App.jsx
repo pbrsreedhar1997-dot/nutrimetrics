@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './hooks/useAuth'
+import { useSocket } from './hooks/useSocket'
 import AuthModal from './components/Auth/AuthModal'
 import Header from './components/Header/Header'
 import BMICalculator from './components/BMI/BMICalculator'
@@ -9,6 +10,7 @@ import WorkoutPlans from './components/Workout/WorkoutPlans'
 import DietPlan from './components/DietPlan/DietPlan'
 import StatsBanner from './components/StatsBanner/StatsBanner'
 import Recipes from './components/Recipes/Recipes'
+import Social from './components/Social/Social'
 
 const LS_STATS = 'nm_userstats'
 
@@ -17,6 +19,20 @@ export default function App() {
   const [tab, setTab]       = useState('bmi')
   const [authOpen, setAuthOpen] = useState(false)
   const [theme, setTheme]   = useState(() => localStorage.getItem('nm_theme') || 'dark')
+  const [hasNotif, setHasNotif] = useState(false)
+  const socket = useSocket(token)
+
+  // ── Notification badge on the Social tab for live social events ────
+  useEffect(() => {
+    const events = ['friend_request', 'friend_accepted', 'new_message', 'new_like', 'new_comment', 'new_post']
+    const offs = events.map(evt => socket.on(evt, () => setHasNotif(true)))
+    return () => offs.forEach(off => off())
+  }, [socket])
+
+  function handleTabChange(t) {
+    setTab(t)
+    if (t === 'social') setHasNotif(false)
+  }
 
   // ── Persisted user stats ──────────────────────────────────────
   const [userStats, setUserStats] = useState(() => {
@@ -77,10 +93,11 @@ export default function App() {
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onLogin={login} />
       <div className="container">
         <Header
-          tab={tab} onTabChange={setTab}
+          tab={tab} onTabChange={handleTabChange}
           username={username} isLoggedIn={isLoggedIn}
           onLoginClick={() => setAuthOpen(true)} onLogout={handleLogout}
           theme={theme} onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+          hasNotif={hasNotif}
         />
 
         {showBanner && (
@@ -93,6 +110,7 @@ export default function App() {
         {tab === 'plan'     && <DietPlan      userStats={userStats} onGoToBMI={() => setTab('bmi')} />}
         {tab === 'activity' && <ActivityTracker token={token} userStats={userStats} />}
         {tab === 'recipes'  && <Recipes userStats={userStats} />}
+        {tab === 'social'   && <Social token={token} />}
       </div>
     </>
   )

@@ -1,12 +1,15 @@
 require('dotenv').config();
 const express = require('express');
+const http = require('http');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const { createSocketServer } = require('./ws');
 
 const app = express();
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nutrimetrics_jwt_secret_change_in_prod';
 
@@ -19,6 +22,8 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
+
+const { pushToUser } = createSocketServer(httpServer, JWT_SECRET);
 
 // ── Middleware ───────────────────────────────────────────────────
 app.use(cors());
@@ -261,11 +266,362 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
   res.json({ id: doc.id, message: 'Saved' });
 });
 
+// ── Social: shared helpers ─────────────────────────────────────────
+async function profilesByIds(ids) {
+  const unique = [...new Set(ids)].filter(Boolean);
+  if (!unique.length) return new Map();
+  const { data } = await supabase.from('profiles').select('id, username').in('id', unique);
+  return new Map((data || []).map(p => [p.id, p]));
+}
+
+async function friendIdsOf(userId) {
+  const { data } = await supabase
+    .from('friendships').select('requester_id, addressee_id')
+    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
+    .eq('status', 'accepted');
+  return (data || []).map(f => f.requester_id === userId ? f.addressee_id : f.requester_id);
+}
+
+async function groupIdsOf(userId) {
+  const { data } = await supabase.from('group_members').select('group_id').eq('user_id', userId);
+  return (data || []).map(g => g.group_id);
+}
+
+async function enrichPosts(posts, myId) {
+  if (!posts.length) return [];
+  const postIds = posts.map(p => p.id);
+  const authorIds = posts.map(p => p.user_id);
+
+  const [{ data: likes }, { data: comments }, authors] = await Promise.all([
+    supabase.from('post_likes').select('post_id, user_id').in('post_id', postIds),
+    supabase.from('post_comments').select('post_id').in('post_id', postIds),
+    profilesByIds(authorIds),
+  ]);
+
+  const likeCounts = {}, likedByMe = {}, commentCounts = {};
+  for (const l of (likes || [])) {
+    likeCounts[l.post_id] = (likeCounts[l.post_id] || 0) + 1;
+    if (l.user_id === myId) likedByMe[l.post_id] = true;
+  }
+  for (const c of (comments || [])) commentCounts[c.post_id] = (commentCounts[c.post_id] || 0) + 1;
+
+  return posts.map(p => ({
+    ...p,
+    author: authors.get(p.user_id)?.username || 'Unknown',
+    like_count: likeCounts[p.id] || 0,
+    liked_by_me: !!likedByMe[p.id],
+    comment_count: commentCounts[p.id] || 0,
+  }));
+}
+
+// ── Friends ──────────────────────────────────────────────────────
+app.post('/api/friends/request', authMiddleware, async (req, res) => {
+  const targetUsername = String(req.body.username || '').trim();
+  if (!targetUsername) return res.status(400).json({ error: 'Username required' });
+  if (targetUsername.toLowerCase() === req.user.username.toLowerCase())
+    return res.status(400).json({ error: "You can't add yourself" });
+
+  const { data: target } = await supabase
+    .from('profiles').select('id, username').ilike('username', targetUsername).maybeSingle();
+  if (!target) return res.status(404).json({ error: 'User not found' });
+
+  const { data: existing } = await supabase
+    .from('friendships').select('id, status')
+    .or(`and(requester_id.eq.${req.user.id},addressee_id.eq.${target.id}),and(requester_id.eq.${target.id},addressee_id.eq.${req.user.id})`)
+    .maybeSingle();
+  if (existing) return res.status(409).json({ error: `Friend request already ${existing.status}` });
+
+  const { data: doc, error } = await supabase
+    .from('friendships')
+    .insert({ requester_id: req.user.id, addressee_id: target.id, status: 'pending' })
+    .select().single();
+  if (error) { console.error('friend request insert error:', error.message); return res.status(500).json({ error: 'Could not send request' }); }
+
+  pushToUser(target.id, { type: 'friend_request', from: { id: req.user.id, username: req.user.username } });
+  res.json({ id: doc.id, message: 'Friend request sent' });
+});
+
+app.post('/api/friends/:id/accept', authMiddleware, async (req, res) => {
+  const { data: row } = await supabase.from('friendships').select('*').eq('id', req.params.id).maybeSingle();
+  if (!row || row.addressee_id !== req.user.id || row.status !== 'pending')
+    return res.status(404).json({ error: 'Request not found' });
+
+  await supabase.from('friendships').update({ status: 'accepted', responded_at: new Date().toISOString() }).eq('id', row.id);
+  pushToUser(row.requester_id, { type: 'friend_accepted', by: { id: req.user.id, username: req.user.username } });
+  res.json({ message: 'Friend request accepted' });
+});
+
+app.post('/api/friends/:id/decline', authMiddleware, async (req, res) => {
+  const { data: row } = await supabase.from('friendships').select('*').eq('id', req.params.id).maybeSingle();
+  if (!row || row.addressee_id !== req.user.id || row.status !== 'pending')
+    return res.status(404).json({ error: 'Request not found' });
+
+  await supabase.from('friendships').update({ status: 'declined', responded_at: new Date().toISOString() }).eq('id', row.id);
+  res.json({ message: 'Friend request declined' });
+});
+
+app.delete('/api/friends/:id', authMiddleware, async (req, res) => {
+  const { data } = await supabase
+    .from('friendships').delete().eq('id', req.params.id)
+    .or(`requester_id.eq.${req.user.id},addressee_id.eq.${req.user.id}`).select();
+  if (!data || !data.length) return res.status(404).json({ error: 'Not found' });
+  res.json({ message: 'Removed' });
+});
+
+app.get('/api/friends', authMiddleware, async (req, res) => {
+  const { data: rows } = await supabase
+    .from('friendships').select('*')
+    .or(`requester_id.eq.${req.user.id},addressee_id.eq.${req.user.id}`)
+    .eq('status', 'accepted');
+  const otherIds = (rows || []).map(r => r.requester_id === req.user.id ? r.addressee_id : r.requester_id);
+  const profiles = await profilesByIds(otherIds);
+  res.json({
+    friends: (rows || []).map(r => {
+      const otherId = r.requester_id === req.user.id ? r.addressee_id : r.requester_id;
+      return { friendshipId: r.id, id: otherId, username: profiles.get(otherId)?.username || 'Unknown' };
+    }),
+  });
+});
+
+app.get('/api/friends/requests', authMiddleware, async (req, res) => {
+  const { data: rows } = await supabase
+    .from('friendships').select('*').eq('addressee_id', req.user.id).eq('status', 'pending');
+  const profiles = await profilesByIds((rows || []).map(r => r.requester_id));
+  res.json({
+    requests: (rows || []).map(r => ({
+      id: r.id, from: { id: r.requester_id, username: profiles.get(r.requester_id)?.username || 'Unknown' }, created_at: r.created_at,
+    })),
+  });
+});
+
+// ── Groups ───────────────────────────────────────────────────────
+app.post('/api/groups', authMiddleware, async (req, res) => {
+  const name = String(req.body.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Group name required' });
+
+  const { data: group, error } = await supabase.from('groups').insert({ name, created_by: req.user.id }).select().single();
+  if (error) { console.error('group insert error:', error.message); return res.status(500).json({ error: 'Could not create group' }); }
+
+  await supabase.from('group_members').insert({ group_id: group.id, user_id: req.user.id, role: 'owner' });
+  res.json({ id: group.id, name: group.name });
+});
+
+app.post('/api/groups/:id/members', authMiddleware, async (req, res) => {
+  const groupId = req.params.id;
+  const targetUsername = String(req.body.username || '').trim();
+
+  const { data: membership } = await supabase
+    .from('group_members').select('*').eq('group_id', groupId).eq('user_id', req.user.id).maybeSingle();
+  if (!membership) return res.status(403).json({ error: 'Not a member of this group' });
+
+  const { data: target } = await supabase.from('profiles').select('id, username').ilike('username', targetUsername).maybeSingle();
+  if (!target) return res.status(404).json({ error: 'User not found' });
+
+  const friendIds = await friendIdsOf(req.user.id);
+  if (!friendIds.includes(target.id)) return res.status(400).json({ error: 'You can only add friends to a group' });
+
+  const { error } = await supabase.from('group_members').insert({ group_id: groupId, user_id: target.id, role: 'member' });
+  if (error) { return res.status(409).json({ error: 'Already a member' }); }
+
+  pushToUser(target.id, { type: 'group_invite', group: { id: groupId } });
+  res.json({ message: 'Added to group' });
+});
+
+app.get('/api/groups', authMiddleware, async (req, res) => {
+  const { data: memberships } = await supabase.from('group_members').select('group_id, role').eq('user_id', req.user.id);
+  const groupIds = (memberships || []).map(m => m.group_id);
+  if (!groupIds.length) return res.json({ groups: [] });
+
+  const { data: groups } = await supabase.from('groups').select('*').in('id', groupIds);
+  const roleByGroup = Object.fromEntries((memberships || []).map(m => [m.group_id, m.role]));
+  res.json({ groups: (groups || []).map(g => ({ ...g, role: roleByGroup[g.id] })) });
+});
+
+app.get('/api/groups/:id', authMiddleware, async (req, res) => {
+  const groupId = req.params.id;
+  const { data: membership } = await supabase
+    .from('group_members').select('*').eq('group_id', groupId).eq('user_id', req.user.id).maybeSingle();
+  if (!membership) return res.status(403).json({ error: 'Not a member of this group' });
+
+  const { data: group } = await supabase.from('groups').select('*').eq('id', groupId).maybeSingle();
+  const { data: members } = await supabase.from('group_members').select('user_id, role').eq('group_id', groupId);
+  const profiles = await profilesByIds((members || []).map(m => m.user_id));
+
+  const { data: posts } = await supabase
+    .from('posts').select('*').eq('group_id', groupId).order('created_at', { ascending: false });
+  const enriched = await enrichPosts(posts || [], req.user.id);
+
+  res.json({
+    group,
+    members: (members || []).map(m => ({ id: m.user_id, username: profiles.get(m.user_id)?.username || 'Unknown', role: m.role })),
+    posts: enriched,
+  });
+});
+
+// ── Feed / Posts ─────────────────────────────────────────────────
+app.post('/api/posts', authMiddleware, async (req, res) => {
+  const { kind, content, activityLogId, groupId } = req.body;
+  if (!['activity', 'thought'].includes(kind)) return res.status(400).json({ error: 'Invalid post kind' });
+
+  let snapshot = { steps: null, distance_km: null, calories_burned: null, active_minutes: null };
+  if (kind === 'activity') {
+    if (!activityLogId) return res.status(400).json({ error: 'activityLogId required for activity posts' });
+    const { data: log } = await supabase
+      .from('activity_logs').select('*').eq('id', activityLogId).eq('user_id', req.user.id).maybeSingle();
+    if (!log) return res.status(404).json({ error: 'Activity log not found' });
+    snapshot = { steps: log.steps, distance_km: log.distance_km, calories_burned: log.calories_burned, active_minutes: log.active_minutes };
+  } else if (!String(content || '').trim()) {
+    return res.status(400).json({ error: 'Content required for a thought post' });
+  }
+
+  if (groupId) {
+    const { data: membership } = await supabase
+      .from('group_members').select('*').eq('group_id', groupId).eq('user_id', req.user.id).maybeSingle();
+    if (!membership) return res.status(403).json({ error: 'Not a member of this group' });
+  }
+
+  const { data: post, error } = await supabase
+    .from('posts')
+    .insert({ user_id: req.user.id, kind, content: content || null, group_id: groupId || null, ...snapshot })
+    .select().single();
+  if (error) { console.error('post insert error:', error.message); return res.status(500).json({ error: 'Could not create post' }); }
+
+  // Best-effort notification fan-out — never blocks the response.
+  (async () => {
+    try {
+      const targetIds = groupId
+        ? (await supabase.from('group_members').select('user_id').eq('group_id', groupId)).data?.map(m => m.user_id) || []
+        : await friendIdsOf(req.user.id);
+      for (const id of targetIds) {
+        if (id !== req.user.id) pushToUser(id, { type: 'new_post', post_id: post.id, author: req.user.username });
+      }
+    } catch (e) { console.error('post fan-out error:', e.message); }
+  })();
+
+  res.json({ id: post.id, message: 'Posted' });
+});
+
+app.get('/api/feed', authMiddleware, async (req, res) => {
+  const [friendIds, myGroupIds] = await Promise.all([friendIdsOf(req.user.id), groupIdsOf(req.user.id)]);
+  const friendScopeIds = [...friendIds, req.user.id];
+
+  const [{ data: friendPosts }, { data: groupPosts }] = await Promise.all([
+    supabase.from('posts').select('*').in('user_id', friendScopeIds).is('group_id', null).order('created_at', { ascending: false }).limit(50),
+    myGroupIds.length
+      ? supabase.from('posts').select('*').in('group_id', myGroupIds).order('created_at', { ascending: false }).limit(50)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const merged = [...(friendPosts || []), ...(groupPosts || [])]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 50);
+
+  res.json({ posts: await enrichPosts(merged, req.user.id) });
+});
+
+app.delete('/api/posts/:id', authMiddleware, async (req, res) => {
+  const { data } = await supabase.from('posts').delete().eq('id', req.params.id).eq('user_id', req.user.id).select();
+  if (!data || !data.length) return res.status(404).json({ error: 'Post not found' });
+  res.json({ message: 'Deleted' });
+});
+
+// ── Likes ────────────────────────────────────────────────────────
+app.post('/api/posts/:id/like', authMiddleware, async (req, res) => {
+  const { data: post } = await supabase.from('posts').select('user_id').eq('id', req.params.id).maybeSingle();
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+
+  const { error } = await supabase.from('post_likes').insert({ post_id: req.params.id, user_id: req.user.id });
+  if (error && error.code !== '23505') { console.error('like insert error:', error.message); return res.status(500).json({ error: 'Could not like post' }); }
+
+  if (post.user_id !== req.user.id)
+    pushToUser(post.user_id, { type: 'new_like', post_id: req.params.id, by: req.user.username });
+  res.json({ message: 'Liked' });
+});
+
+app.delete('/api/posts/:id/like', authMiddleware, async (req, res) => {
+  await supabase.from('post_likes').delete().eq('post_id', req.params.id).eq('user_id', req.user.id);
+  res.json({ message: 'Unliked' });
+});
+
+// ── Comments ─────────────────────────────────────────────────────
+app.post('/api/posts/:id/comments', authMiddleware, async (req, res) => {
+  const content = String(req.body.content || '').trim();
+  if (!content) return res.status(400).json({ error: 'Comment content required' });
+
+  const { data: post } = await supabase.from('posts').select('user_id').eq('id', req.params.id).maybeSingle();
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+
+  const { data: doc, error } = await supabase
+    .from('post_comments').insert({ post_id: req.params.id, user_id: req.user.id, content }).select().single();
+  if (error) { console.error('comment insert error:', error.message); return res.status(500).json({ error: 'Could not add comment' }); }
+
+  if (post.user_id !== req.user.id)
+    pushToUser(post.user_id, { type: 'new_comment', post_id: req.params.id, by: req.user.username, content });
+  res.json({ id: doc.id, message: 'Commented' });
+});
+
+app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
+  const { data: comments } = await supabase
+    .from('post_comments').select('*').eq('post_id', req.params.id).order('created_at', { ascending: true });
+  const profiles = await profilesByIds((comments || []).map(c => c.user_id));
+  res.json({
+    comments: (comments || []).map(c => ({ ...c, author: profiles.get(c.user_id)?.username || 'Unknown' })),
+  });
+});
+
+// ── Messages ─────────────────────────────────────────────────────
+app.get('/api/messages/conversations', authMiddleware, async (req, res) => {
+  const { data: rows } = await supabase
+    .from('messages').select('*')
+    .or(`sender_id.eq.${req.user.id},recipient_id.eq.${req.user.id}`)
+    .order('created_at', { ascending: false });
+
+  const byOther = new Map();
+  for (const m of (rows || [])) {
+    const otherId = m.sender_id === req.user.id ? m.recipient_id : m.sender_id;
+    if (!byOther.has(otherId)) byOther.set(otherId, { lastMessage: m, unread: 0 });
+    if (m.recipient_id === req.user.id && !m.read_at) byOther.get(otherId).unread++;
+  }
+  const profiles = await profilesByIds([...byOther.keys()]);
+  res.json({
+    conversations: [...byOther.entries()].map(([id, v]) => ({
+      id, username: profiles.get(id)?.username || 'Unknown',
+      lastMessage: v.lastMessage.content, lastMessageAt: v.lastMessage.created_at, unread: v.unread,
+    })),
+  });
+});
+
+app.get('/api/messages/:userId', authMiddleware, async (req, res) => {
+  const otherId = req.params.userId;
+  const { data: rows } = await supabase
+    .from('messages').select('*')
+    .or(`and(sender_id.eq.${req.user.id},recipient_id.eq.${otherId}),and(sender_id.eq.${otherId},recipient_id.eq.${req.user.id})`)
+    .order('created_at', { ascending: true });
+
+  supabase.from('messages').update({ read_at: new Date().toISOString() })
+    .eq('sender_id', otherId).eq('recipient_id', req.user.id).is('read_at', null)
+    .then(() => {}).catch(e => console.error('mark-read error:', e.message));
+
+  res.json({ messages: rows || [] });
+});
+
+app.post('/api/messages/:userId', authMiddleware, async (req, res) => {
+  const content = String(req.body.content || '').trim();
+  if (!content) return res.status(400).json({ error: 'Message content required' });
+
+  const { data: doc, error } = await supabase
+    .from('messages').insert({ sender_id: req.user.id, recipient_id: req.params.userId, content }).select().single();
+  if (error) { console.error('message insert error:', error.message); return res.status(500).json({ error: 'Could not send message' }); }
+
+  pushToUser(req.params.userId, { type: 'new_message', from: { id: req.user.id, username: req.user.username }, content, created_at: doc.created_at });
+  res.json({ id: doc.id, message: 'Sent' });
+});
+
 // ── Serve frontend ───────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`\n  NutriMetrics server → http://localhost:${PORT}\n`);
 });

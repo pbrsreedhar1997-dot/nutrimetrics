@@ -51,6 +51,14 @@ const IcoRecipes = ({ size }) => (
     <path d="M8 20h8"/>
   </Ico>
 )
+const IcoSocial = ({ size }) => (
+  <Ico size={size}>
+    <circle cx="9" cy="8" r="3"/>
+    <path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6"/>
+    <circle cx="18" cy="7" r="2.3"/>
+    <path d="M15.5 14c2.7.3 5 2.2 5 4.7"/>
+  </Ico>
+)
 
 const TABS = [
   { id: 'bmi',      label: 'BMI',      fullLabel: 'BMI Calculator', navLabel: 'BMI',      Icon: IcoBMI      },
@@ -59,9 +67,10 @@ const TABS = [
   { id: 'plan',     label: 'My Plan',  fullLabel: 'My Plan',        navLabel: 'Plan',     Icon: IcoPlan     },
   { id: 'activity', label: 'Activity', fullLabel: 'Activity',       navLabel: 'Activity', Icon: IcoActivity },
   { id: 'recipes',  label: 'Recipes',  fullLabel: 'Recipes',        navLabel: 'Recipes',  Icon: IcoRecipes  },
+  { id: 'social',   label: 'Social',   fullLabel: 'Social',         navLabel: 'Social',   Icon: IcoSocial   },
 ]
 
-export default function Header({ tab, onTabChange, username, isLoggedIn, onLoginClick, onLogout, theme, onThemeToggle }) {
+export default function Header({ tab, onTabChange, username, isLoggedIn, onLoginClick, onLogout, theme, onThemeToggle, hasNotif }) {
   return (
     <>
       <div className={styles.topbar}>
@@ -94,6 +103,7 @@ export default function Header({ tab, onTabChange, username, isLoggedIn, onLogin
               onClick={() => onTabChange(t.id)}>
               <span className={styles.tabIco}><t.Icon size={15} /></span>
               {t.fullLabel}
+              {t.id === 'social' && hasNotif && <span className={styles.notifBadge} />}
             </button>
           ))}
         </div>
@@ -106,7 +116,10 @@ export default function Header({ tab, onTabChange, username, isLoggedIn, onLogin
             <button key={t.id}
               className={`${styles.navItem} ${tab === t.id ? styles.active : ''}`}
               onClick={() => onTabChange(t.id)}>
-              <span className={styles.navIcon}><t.Icon size={20} /></span>
+              <span className={styles.navIcon}>
+                <t.Icon size={20} />
+                {t.id === 'social' && hasNotif && <span className={styles.notifBadge} />}
+              </span>
               <span className={styles.navLabel}>{t.navLabel}</span>
               <span className={styles.navDot} />
             </button>
