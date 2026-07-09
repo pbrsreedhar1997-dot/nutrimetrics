@@ -33,6 +33,41 @@ function Ring({ value, max, label, unit, color, size = 116 }) {
   )
 }
 
+function GetApp() {
+  const [showIos, setShowIos] = useState(false)
+  return (
+    <div className={styles.getApp}>
+      <div className={styles.getAppHead}>
+        <span className={styles.getAppIcon}>📲</span>
+        <div>
+          <div className={styles.appTitle}>Get the app</div>
+          <div className={styles.appSub}>Install NutriMetrics on your phone</div>
+        </div>
+      </div>
+      <div className={styles.getAppRow}>
+        <a className={styles.storeBtn} href="/downloads/NutriMetrics.apk" download>
+          <span>🤖</span> Android<small>Download APK</small>
+        </a>
+        <button className={styles.storeBtn} type="button" onClick={() => setShowIos(s => !s)}>
+          <span></span> iPhone<small>Add to Home Screen</small>
+        </button>
+      </div>
+      {showIos && (
+        <div className={styles.iosSteps}>
+          <b>Install on iPhone (no App Store needed):</b>
+          <ol>
+            <li>Open this site in <b>Safari</b></li>
+            <li>Tap the <b>Share</b> button <span aria-hidden="true">⬆️</span> at the bottom</li>
+            <li>Scroll down and tap <b>“Add to Home Screen”</b></li>
+            <li>Tap <b>Add</b> — NutriMetrics appears as an app icon</li>
+          </ol>
+          <div className={styles.iosNote}>Apple only allows iPhone apps via this method or the App Store — a direct download isn’t possible.</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Consecutive days (ending today or yesterday) with any recorded steps.
 function computeStreak(logs) {
   const byDate = new Set((logs || []).filter(l => (l.steps || 0) > 0).map(l => l.date))
@@ -80,6 +115,7 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
           <h1>Welcome to NutriMetrics</h1>
           <p>Sign in to track your steps, workouts, nutrition, and compete with friends.</p>
         </div>
+        <GetApp />
       </div>
     )
   }
@@ -134,14 +170,7 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
         </div>
       )}
 
-      <a className={styles.appBanner} href="/downloads/NutriMetrics.apk" download>
-        <span className={styles.appIcon}>🤖</span>
-        <div className={styles.appText}>
-          <div className={styles.appTitle}>Get the Android app</div>
-          <div className={styles.appSub}>Install NutriMetrics on your phone · APK</div>
-        </div>
-        <span className={styles.appArrow}>↓</span>
-      </a>
+      <GetApp />
     </div>
   )
 }

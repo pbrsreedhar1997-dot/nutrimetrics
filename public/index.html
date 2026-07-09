@@ -3,16 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>NutriMetrics — Health Tracker</title>
+
+    <!-- PWA / installable app -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#00e5c0" />
+    <!-- iOS "Add to Home Screen" support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="NutriMetrics" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/assets/index-CVXU2v0-.js"></script>
+    <script type="module" crossorigin src="/assets/index-DF9x_e3n.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/chunk-B3K2TuZy.js">
     <link rel="modulepreload" crossorigin href="/assets/preload-helper-DSXbuxSR.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-BiF37c40.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-B4ORRRQS.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}))
+      }
+    </script>
   </body>
 </html>
