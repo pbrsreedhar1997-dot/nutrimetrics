@@ -1,0 +1,10 @@
+{
+  "appId": "com.nutrimetrics.app",
+  "appName": "NutriMetrics",
+  "webDir": "public",
+  "server": {
+    "url": "https://nutrimetrics.onrender.com",
+    "cleartext": false,
+    "androidScheme": "https"
+  }
+}

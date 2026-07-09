@@ -6,3 +6,7 @@ client/dist/
 .env.local
 .DS_Store
 *.log
+
+# Capacitor native project (regenerate with: npx cap add android)
+android/
+.gradle/
