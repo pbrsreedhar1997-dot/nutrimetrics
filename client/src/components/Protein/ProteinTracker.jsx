@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { FOODS } from '../../data/foods'
 import { apiCall } from '../../api'
+import { localDateStr } from '../../utils/date'
 import styles from './ProteinTracker.module.css'
 
-const today = () => new Date().toISOString().split('T')[0]
+const today = () => localDateStr()
 
 export default function ProteinTracker({ token, userStats }) {
   const lastWeightKg = userStats?.weightKg ?? null

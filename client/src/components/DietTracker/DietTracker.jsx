@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { FOODS } from '../../data/foods'
+import { localDateStr } from '../../utils/date'
 import styles from './DietTracker.module.css'
 
 const API = '/api'
-const TODAY = () => new Date().toISOString().split('T')[0]
+const TODAY = () => localDateStr()
 
 // Daily recommended values
 const RDA = {

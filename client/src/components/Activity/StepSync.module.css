@@ -63,9 +63,17 @@
   font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
 }
 .histBtn:hover { border-color: var(--accent); }
+.histTabs { display: flex; gap: 6px; margin-bottom: 4px; }
+.histTab {
+  flex: 1; padding: 8px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text3); font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer;
+}
+.histTabActive { background: var(--grad-accent); border-color: transparent; color: #000; }
 .histList { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; }
 .histRow {
   display: flex; align-items: center; justify-content: space-between;
   padding: 9px 12px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text2);
 }
 .histRow strong { color: var(--text); font-family: 'DM Mono', monospace; }
+.histRowMeta { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.histRowMeta strong { color: var(--text); font-family: 'DM Mono', monospace; }

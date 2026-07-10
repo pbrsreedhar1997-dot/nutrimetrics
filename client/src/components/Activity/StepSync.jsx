@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Health } from 'capacitor-health'
+import { localDateStr, groupByWeek, groupByMonth, fmtWeekRange, fmtMonth } from '../../utils/date'
 import styles from './StepSync.module.css'
 
 const API   = '/api'
-const TODAY = () => new Date().toISOString().split('T')[0]
+const TODAY = () => localDateStr()
 const APK_URL = '/downloads/NutriMetrics.apk'
 
 export default function StepSync({ token, userStats }) {
@@ -19,6 +20,7 @@ export default function StepSync({ token, userStats }) {
   const [goalInput, setGoalInput] = useState('10000')
   const [history,   setHistory]   = useState([])
   const [fullHistory, setFullHistory] = useState(null) // lazy-loaded up to a year
+  const [histView, setHistView]   = useState('daily')  // 'daily' | 'weekly' | 'monthly'
   const [status,    setStatus]    = useState('')
   const [lastSync,  setLastSync]  = useState(null)
 
@@ -105,7 +107,7 @@ export default function StepSync({ token, userStats }) {
   const cal    = Math.round(steps * 0.04 * (weightKg / 70))
   const last7 = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() - (6 - i))
-    const key = d.toISOString().split('T')[0]
+    const key = localDateStr(d)
     const log = history.find(l => l.date === key)
     return { label: d.toLocaleDateString('en', { weekday: 'short' }), steps: log?.steps || 0, isToday: key === TODAY() }
   })
@@ -220,13 +222,52 @@ export default function StepSync({ token, userStats }) {
             }}>View full history →</button>
           ) : (
             <div className={styles.histList}>
-              <div className={styles.historyHead} style={{ marginTop: 14 }}>All-time · {fullHistory.length} days recorded</div>
-              {fullHistory.map(l => (
-                <div key={l.id} className={styles.histRow}>
-                  <span>{new Date(l.date).toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short', year: '2-digit' })}</span>
-                  <strong>{(l.steps || 0).toLocaleString()} steps</strong>
-                </div>
-              ))}
+              <div className={styles.histTabs}>
+                {['daily', 'weekly', 'monthly'].map(v => (
+                  <button key={v} className={`${styles.histTab} ${histView === v ? styles.histTabActive : ''}`}
+                    onClick={() => setHistView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>
+                ))}
+              </div>
+
+              {histView === 'daily' && (
+                <>
+                  <div className={styles.historyHead} style={{ marginTop: 14 }}>All-time · {fullHistory.length} days recorded</div>
+                  {fullHistory.map(l => (
+                    <div key={l.id} className={styles.histRow}>
+                      <span>{new Date(l.date).toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short', year: '2-digit' })}</span>
+                      <strong>{(l.steps || 0).toLocaleString()} steps</strong>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {histView === 'weekly' && (
+                <>
+                  <div className={styles.historyHead} style={{ marginTop: 14 }}>By week</div>
+                  {groupByWeek(fullHistory).map(w => (
+                    <div key={w.key} className={styles.histRow}>
+                      <span>{fmtWeekRange(w)}</span>
+                      <span className={styles.histRowMeta}>
+                        <strong>{w.total.toLocaleString()}</strong> · avg {Math.round(w.total / w.days).toLocaleString()}/day
+                      </span>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {histView === 'monthly' && (
+                <>
+                  <div className={styles.historyHead} style={{ marginTop: 14 }}>By month</div>
+                  {groupByMonth(fullHistory).map(m => (
+                    <div key={m.key} className={styles.histRow}>
+                      <span>{fmtMonth(m.key)}</span>
+                      <span className={styles.histRowMeta}>
+                        <strong>{m.total.toLocaleString()}</strong> · avg {Math.round(m.total / m.days).toLocaleString()}/day
+                      </span>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           )}
         </div>

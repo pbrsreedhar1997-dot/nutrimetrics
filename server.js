@@ -54,8 +54,11 @@ function authMiddleware(req, res, next) {
   }
 }
 
+// IST (UTC+5:30) local date — the server runs in UTC, and a plain toISOString()
+// would flip the "day" at 5:30am IST instead of local midnight.
 function today() {
-  return new Date().toISOString().split('T')[0];
+  const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return ist.toISOString().split('T')[0];
 }
 
 function issueToken(profile) {

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { apiCall } from '../../api'
+import { localDateStr } from '../../utils/date'
 import styles from './Social.module.css'
 
-const TODAY = () => new Date().toISOString().split('T')[0]
-function plusDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().split('T')[0] }
+const TODAY = () => localDateStr()
+function plusDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return localDateStr(d) }
 
 const MEDALS = ['🥇', '🥈', '🥉']
 

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { apiCall } from '../../api'
+import { localDateStr } from '../../utils/date'
 import styles from './Dashboard.module.css'
 
-const TODAY = () => new Date().toISOString().split('T')[0]
+const TODAY = () => localDateStr()
 
 function Ring({ value, max, label, unit, color, size = 116 }) {
   const pct = max > 0 ? Math.min(1, value / max) : 0
@@ -74,8 +75,8 @@ function computeStreak(logs) {
   let streak = 0
   const d = new Date()
   // allow the streak to still count if today isn't logged yet
-  if (!byDate.has(d.toISOString().split('T')[0])) d.setDate(d.getDate() - 1)
-  while (byDate.has(d.toISOString().split('T')[0])) { streak++; d.setDate(d.getDate() - 1) }
+  if (!byDate.has(localDateStr(d))) d.setDate(d.getDate() - 1)
+  while (byDate.has(localDateStr(d))) { streak++; d.setDate(d.getDate() - 1) }
   return streak
 }
 
