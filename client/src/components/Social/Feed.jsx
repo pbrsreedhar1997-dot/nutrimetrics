@@ -1,6 +1,55 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiCall } from '../../api'
 import styles from './Social.module.css'
+
+const MAX_MEDIA_MB = 50
+
+function MediaPicker({ token, media, setMedia, uploading, setUploading }) {
+  const inputRef = useRef(null)
+
+  async function onFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow picking the same file again later
+    if (!file) return
+    if (file.size > MAX_MEDIA_MB * 1024 * 1024) { alert(`File too large — max ${MAX_MEDIA_MB}MB`); return }
+
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await fetch('/api/media/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      }).then(r => r.json())
+      if (res.error) throw new Error(res.error)
+      setMedia({ url: res.url, type: res.type })
+    } catch (err) {
+      alert(err.message || 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className={styles.mediaPicker}>
+      <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+        hidden onChange={onFile} />
+      {!media ? (
+        <button type="button" className={styles.mediaAddBtn} disabled={uploading} onClick={() => inputRef.current.click()}>
+          {uploading ? 'Uploading…' : '📎 Add photo / gif / video'}
+        </button>
+      ) : (
+        <div className={styles.mediaPreview}>
+          {media.type === 'video'
+            ? <video src={media.url} muted controls />
+            : <img src={media.url} alt="" />}
+          <button type="button" className={styles.mediaRemove} onClick={() => setMedia(null)}>✕ Remove</button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function Composer({ token, onPosted }) {
   const [mode, setMode]       = useState('thought') // 'thought' | 'activity'
@@ -10,6 +59,8 @@ function Composer({ token, onPosted }) {
   const [groups, setGroups]   = useState([])
   const [groupId, setGroupId] = useState('')
   const [posting, setPosting] = useState(false)
+  const [media, setMedia]     = useState(null) // { url, type }
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     apiCall('GET', '/activity-log', null, token).then(r => setRecentLogs(r.logs || []))
@@ -20,12 +71,12 @@ function Composer({ token, onPosted }) {
     e.preventDefault()
     setPosting(true)
     const body = mode === 'thought'
-      ? { kind: 'thought', content: content.trim(), groupId: groupId || undefined }
-      : { kind: 'activity', activityLogId: selectedLog, groupId: groupId || undefined }
+      ? { kind: 'thought', content: content.trim(), groupId: groupId || undefined, mediaUrl: media?.url, mediaType: media?.type }
+      : { kind: 'activity', activityLogId: selectedLog, groupId: groupId || undefined, mediaUrl: media?.url, mediaType: media?.type }
     const res = await apiCall('POST', '/posts', body, token)
     setPosting(false)
     if (!res.error) {
-      setContent(''); setSelectedLog(''); setGroupId('')
+      setContent(''); setSelectedLog(''); setGroupId(''); setMedia(null)
       onPosted()
     }
   }
@@ -39,7 +90,7 @@ function Composer({ token, onPosted }) {
 
       {mode === 'thought' ? (
         <textarea placeholder="Share what's on your mind…" value={content}
-          onChange={e => setContent(e.target.value)} required rows={2} />
+          onChange={e => setContent(e.target.value)} required={!media} rows={2} />
       ) : (
         <select value={selectedLog} onChange={e => setSelectedLog(e.target.value)} required>
           <option value="">Pick a day to share…</option>
@@ -49,6 +100,8 @@ function Composer({ token, onPosted }) {
         </select>
       )}
 
+      <MediaPicker token={token} media={media} setMedia={setMedia} uploading={uploading} setUploading={setUploading} />
+
       {groups.length > 0 && (
         <select value={groupId} onChange={e => setGroupId(e.target.value)}>
           <option value="">Share with all friends</option>
@@ -56,7 +109,7 @@ function Composer({ token, onPosted }) {
         </select>
       )}
 
-      <button type="submit" className={styles.postBtn} disabled={posting}>{posting ? 'Posting…' : 'Post'}</button>
+      <button type="submit" className={styles.postBtn} disabled={posting || uploading}>{posting ? 'Posting…' : 'Post'}</button>
     </form>
   )
 }
@@ -127,7 +180,14 @@ function Post({ token, post, onChanged }) {
             🚶 <strong>{post.steps?.toLocaleString()}</strong> steps · {post.distance_km} km · {Math.round(post.calories_burned || 0)} kcal
           </div>
         ) : (
-          <div className={styles.postContent}>{post.content}</div>
+          post.content && <div className={styles.postContent}>{post.content}</div>
+        )}
+        {post.media_url && (
+          <div className={styles.postMedia}>
+            {post.media_type === 'video'
+              ? <video src={post.media_url} controls playsInline />
+              : <img src={post.media_url} alt="" loading="lazy" />}
+          </div>
         )}
         {burst && <span className={styles.heartBurst}>❤</span>}
       </div>

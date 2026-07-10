@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const multer = require('multer');
 const { createSocketServer } = require('./ws');
 
 const app = express();
@@ -29,6 +30,37 @@ const { pushToUser } = createSocketServer(httpServer, JWT_SECRET);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Media upload (feed posts) ───────────────────────────────────
+// Buffers the file in memory (never touches disk) then hands it straight to
+// the "media" Supabase Storage bucket — matches its own 50MB / mime allow-list.
+const ALLOWED_MEDIA_MIME = {
+  'image/png': 'image', 'image/jpeg': 'image', 'image/webp': 'image',
+  'image/gif': 'gif',
+  'video/mp4': 'video', 'video/webm': 'video', 'video/quicktime': 'video',
+};
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => cb(null, !!ALLOWED_MEDIA_MIME[file.mimetype]),
+});
+
+app.post('/api/media/upload', authMiddleware, upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file, or unsupported file type' });
+
+  const mediaType = ALLOWED_MEDIA_MIME[req.file.mimetype];
+  const ext = req.file.originalname.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+  const objectPath = `${req.user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+  const { error } = await supabase.storage.from('media').upload(objectPath, req.file.buffer, {
+    contentType: req.file.mimetype,
+    upsert: false,
+  });
+  if (error) { console.error('media upload error:', error.message); return res.status(500).json({ error: 'Upload failed' }); }
+
+  const { data: pub } = supabase.storage.from('media').getPublicUrl(objectPath);
+  res.json({ url: pub.publicUrl, type: mediaType });
+});
 
 // APK download — explicit route with an attachment filename + Android package
 // MIME so mobile browsers save it as a real installable .apk (otherwise some
@@ -505,8 +537,10 @@ app.get('/api/groups/:id', authMiddleware, async (req, res) => {
 
 // ── Feed / Posts ─────────────────────────────────────────────────
 app.post('/api/posts', authMiddleware, async (req, res) => {
-  const { kind, content, activityLogId, groupId } = req.body;
+  const { kind, content, activityLogId, groupId, mediaUrl, mediaType } = req.body;
   if (!['activity', 'thought'].includes(kind)) return res.status(400).json({ error: 'Invalid post kind' });
+  if (mediaUrl && !['image', 'gif', 'video'].includes(mediaType))
+    return res.status(400).json({ error: 'Invalid media type' });
 
   let snapshot = { steps: null, distance_km: null, calories_burned: null, active_minutes: null };
   if (kind === 'activity') {
@@ -515,8 +549,8 @@ app.post('/api/posts', authMiddleware, async (req, res) => {
       .from('activity_logs').select('*').eq('id', activityLogId).eq('user_id', req.user.id).maybeSingle();
     if (!log) return res.status(404).json({ error: 'Activity log not found' });
     snapshot = { steps: log.steps, distance_km: log.distance_km, calories_burned: log.calories_burned, active_minutes: log.active_minutes };
-  } else if (!String(content || '').trim()) {
-    return res.status(400).json({ error: 'Content required for a thought post' });
+  } else if (!String(content || '').trim() && !mediaUrl) {
+    return res.status(400).json({ error: 'Content or media required for a thought post' });
   }
 
   if (groupId) {
@@ -527,7 +561,11 @@ app.post('/api/posts', authMiddleware, async (req, res) => {
 
   const { data: post, error } = await supabase
     .from('posts')
-    .insert({ user_id: req.user.id, kind, content: content || null, group_id: groupId || null, ...snapshot })
+    .insert({
+      user_id: req.user.id, kind, content: content || null, group_id: groupId || null,
+      media_url: mediaUrl || null, media_type: mediaUrl ? mediaType : null,
+      ...snapshot,
+    })
     .select().single();
   if (error) { console.error('post insert error:', error.message); return res.status(500).json({ error: 'Could not create post' }); }
 
