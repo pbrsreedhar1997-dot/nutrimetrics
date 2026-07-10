@@ -1,5 +1,17 @@
 apply plugin: 'com.android.application'
 
+// Stable release signing — a fixed keystore (not the machine-local, ephemeral
+// debug.keystore) so every rebuild keeps the same signature. Android refuses
+// to install an "update" whose signature doesn't match what's already on the
+// device, so a debug build re-signed with a regenerated debug key silently
+// fails to install with no error shown — this is what a stable release
+// keystore avoids going forward.
+def keystorePropertiesFile = rootProject.file("app/../keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.nutrimetrics.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +28,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile rootProject.file("app/../" + keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : null
         }
     }
 }
