@@ -24,7 +24,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-const { pushToUser } = createSocketServer(httpServer, JWT_SECRET);
+const { pushToUser, pushToUsers } = createSocketServer(httpServer, JWT_SECRET);
 
 // ── Middleware ───────────────────────────────────────────────────
 app.use(cors());
@@ -533,6 +533,99 @@ app.get('/api/groups/:id', authMiddleware, async (req, res) => {
     members: (members || []).map(m => ({ id: m.user_id, username: profiles.get(m.user_id)?.username || 'Unknown', role: m.role })),
     posts: enriched,
   });
+});
+
+// Group chat — a message thread per group, shown next to 1:1 DMs in the
+// unified Connections list (mirrors WhatsApp: group name + last message).
+app.get('/api/groups/:id/messages', authMiddleware, async (req, res) => {
+  const groupId = req.params.id;
+  const { data: membership } = await supabase
+    .from('group_members').select('*').eq('group_id', groupId).eq('user_id', req.user.id).maybeSingle();
+  if (!membership) return res.status(403).json({ error: 'Not a member of this group' });
+
+  const { data: rows } = await supabase
+    .from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true });
+  const profiles = await profilesByIds((rows || []).map(m => m.sender_id));
+  res.json({
+    messages: (rows || []).map(m => ({ ...m, sender_username: profiles.get(m.sender_id)?.username || 'Unknown' })),
+  });
+});
+
+app.post('/api/groups/:id/messages', authMiddleware, async (req, res) => {
+  const groupId = req.params.id;
+  const content = String(req.body.content || '').trim();
+  if (!content) return res.status(400).json({ error: 'Message content required' });
+
+  const { data: membership } = await supabase
+    .from('group_members').select('*').eq('group_id', groupId).eq('user_id', req.user.id).maybeSingle();
+  if (!membership) return res.status(403).json({ error: 'Not a member of this group' });
+
+  const { data: doc, error } = await supabase
+    .from('group_messages').insert({ group_id: groupId, sender_id: req.user.id, content }).select().single();
+  if (error) { console.error('group message insert error:', error.message); return res.status(500).json({ error: 'Could not send message' }); }
+
+  const { data: members } = await supabase.from('group_members').select('user_id').eq('group_id', groupId);
+  const targetIds = (members || []).map(m => m.user_id).filter(id => id !== req.user.id);
+  pushToUsers(targetIds, {
+    type: 'new_group_message', group_id: groupId,
+    from: { id: req.user.id, username: req.user.username }, content, created_at: doc.created_at,
+  });
+  res.json({ id: doc.id, message: 'Sent' });
+});
+
+app.delete('/api/group-messages/:id', authMiddleware, async (req, res) => {
+  const { data } = await supabase
+    .from('group_messages').delete().eq('id', req.params.id).eq('sender_id', req.user.id).select();
+  if (!data || !data.length) return res.status(404).json({ error: 'Message not found' });
+
+  const { data: members } = await supabase.from('group_members').select('user_id').eq('group_id', data[0].group_id);
+  pushToUsers((members || []).map(m => m.user_id), { type: 'group_message_deleted', group_id: data[0].group_id, id: req.params.id });
+  res.json({ message: 'Deleted' });
+});
+
+// Unified conversation list — 1:1 DMs and group chats together, sorted by
+// most recent activity, so Connections can show one WhatsApp-style list
+// instead of separate People/Groups/Chats tabs.
+app.get('/api/conversations', authMiddleware, async (req, res) => {
+  const { data: dmRows } = await supabase
+    .from('messages').select('*')
+    .or(`sender_id.eq.${req.user.id},recipient_id.eq.${req.user.id}`)
+    .order('created_at', { ascending: false });
+
+  const byOther = new Map();
+  for (const m of (dmRows || [])) {
+    const otherId = m.sender_id === req.user.id ? m.recipient_id : m.sender_id;
+    if (!byOther.has(otherId)) byOther.set(otherId, { lastMessage: m, unread: 0 });
+    if (m.recipient_id === req.user.id && !m.read_at) byOther.get(otherId).unread++;
+  }
+
+  const { data: memberships } = await supabase.from('group_members').select('group_id').eq('user_id', req.user.id);
+  const groupIds = (memberships || []).map(m => m.group_id);
+  const [{ data: groups }, { data: groupMsgRows }] = await Promise.all([
+    groupIds.length ? supabase.from('groups').select('*').in('id', groupIds) : Promise.resolve({ data: [] }),
+    groupIds.length
+      ? supabase.from('group_messages').select('*').in('group_id', groupIds).order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] }),
+  ]);
+  const lastGroupMsg = new Map();
+  for (const m of (groupMsgRows || [])) if (!lastGroupMsg.has(m.group_id)) lastGroupMsg.set(m.group_id, m);
+
+  const profiles = await profilesByIds([...byOther.keys()]);
+  const dmConvos = [...byOther.entries()].map(([id, v]) => ({
+    type: 'dm', id, name: profiles.get(id)?.username || 'Unknown',
+    lastMessage: v.lastMessage.content, lastAt: v.lastMessage.created_at, unread: v.unread,
+  }));
+  const groupConvos = (groups || []).map(g => {
+    const last = lastGroupMsg.get(g.id);
+    return {
+      type: 'group', id: g.id, name: g.name,
+      lastMessage: last ? last.content : 'No messages yet',
+      lastAt: last ? last.created_at : g.created_at, unread: 0,
+    };
+  });
+
+  const merged = [...dmConvos, ...groupConvos].sort((a, b) => new Date(b.lastAt) - new Date(a.lastAt));
+  res.json({ conversations: merged });
 });
 
 // ── Feed / Posts ─────────────────────────────────────────────────

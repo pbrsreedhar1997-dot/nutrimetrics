@@ -89,7 +89,7 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
   useEffect(() => {
     if (!token) return
     apiCall('GET', '/activity-log', null, token).then(r => {
-      const t = (r.logs || []).find(l => l.date === TODAY()) || (r.logs || [])[0] || null
+      const t = (r.logs || []).find(l => l.date === TODAY()) || null
       setActivity(t)
       setStreak(computeStreak(r.logs))
     })

@@ -11,7 +11,7 @@ const SUB_TABS = [
   { id: 'connections', label: '👥 Connections' },
 ]
 
-export default function Social({ token }) {
+export default function Social({ token, username }) {
   const [tab, setTab] = useState('feed')
   const socket = useSocket(token)
 
@@ -32,7 +32,7 @@ export default function Social({ token }) {
 
       {tab === 'feed'        && <Feed        token={token} socket={socket} />}
       {tab === 'challenges'  && <Challenges  token={token} socket={socket} />}
-      {tab === 'connections' && <Connections token={token} socket={socket} />}
+      {tab === 'connections' && <Connections token={token} socket={socket} username={username} />}
     </div>
   )
 }

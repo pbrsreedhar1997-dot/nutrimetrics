@@ -240,6 +240,61 @@
   font-size: 15px; padding: 2px 6px; line-height: 1; border-radius: 6px;
 }
 .delBtn:hover { color: var(--red); background: var(--surface3); }
+/* ── Unified conversation list (WhatsApp-style Chats) ─────── */
+.chatsHead { display: flex; align-items: center; justify-content: space-between; }
+.chatsHeadActions { display: flex; gap: 8px; }
+.iconBtn {
+  padding: 8px 12px; border-radius: 9px; border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text2); font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.iconBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+.requestBanner {
+  padding: 10px 14px; background: var(--grad-accent); color: #000;
+  border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 700; cursor: pointer;
+}
+
+.convoList { display: flex; flex-direction: column; gap: 2px; }
+.convoRow {
+  display: flex; align-items: center; gap: 12px; padding: 10px 8px;
+  border-radius: var(--radius-sm); cursor: pointer;
+}
+.convoRow:hover { background: var(--surface2); }
+.avatar {
+  flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--grad-accent); color: #000; display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 17px;
+}
+.avatarGroup { background: var(--surface3); color: var(--text2); font-size: 18px; }
+.convoBody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.convoTop { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.convoName { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14.5px; color: var(--text); }
+.convoTime { font-size: 11px; color: var(--text3); flex-shrink: 0; }
+.convoBottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.convoPreview { font-size: 13px; color: var(--text3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.unreadDot {
+  flex-shrink: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 10px;
+  background: var(--grad-accent); color: #000; font-size: 10.5px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Group thread extras ────────────────────────────────────── */
+.threadHead { display: flex; align-items: center; justify-content: space-between; }
+.threadHead h3 { margin: 0; }
+.infoBtn {
+  background: none; border: 1px solid var(--border2); color: var(--text2);
+  border-radius: 50%; width: 28px; height: 28px; font-size: 13px; cursor: pointer;
+}
+.groupSender { font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 2px; }
+.groupNameInput {
+  width: 100%; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 14px;
+}
+.pickRow {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  background: var(--surface2); border-radius: 8px; font-size: 13.5px; color: var(--text); cursor: pointer;
+}
+
 .bubbleWrap { display: flex; align-items: center; gap: 6px; }
 .bubbleWrap.mine { flex-direction: row-reverse; align-self: flex-end; }
 .msgDel {

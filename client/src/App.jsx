@@ -97,7 +97,7 @@ export default function App() {
         {tab === 'home'      && <Dashboard    token={token} username={username} userStats={userStats} onNavigate={handleTabChange} />}
         {tab === 'activity'  && <ActivityHub  token={token} userStats={userStats} />}
         {tab === 'nutrition' && <NutritionHub token={token} userStats={userStats} onBMIResult={handleBMIResult} />}
-        {tab === 'social'    && <Social       token={token} />}
+        {tab === 'social'    && <Social       token={token} username={username} />}
       </div>
     </>
   )
