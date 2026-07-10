@@ -255,8 +255,11 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
 
 // ── Activity Log ─────────────────────────────────────────────────
 app.get('/api/activity-log', authMiddleware, async (req, res) => {
+  // Daily rows are stored permanently; default returns the last week, but a
+  // larger window (up to a year) can be requested for history views.
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 7, 1), 400);
   const { data: logs } = await supabase
-    .from('activity_logs').select('*').eq('user_id', req.user.id).order('date', { ascending: false }).limit(7);
+    .from('activity_logs').select('*').eq('user_id', req.user.id).order('date', { ascending: false }).limit(limit);
   res.json({ logs: logs || [] });
 });
 
@@ -319,6 +322,7 @@ async function enrichPosts(posts, myId) {
   return posts.map(p => ({
     ...p,
     author: authors.get(p.user_id)?.username || 'Unknown',
+    is_mine: p.user_id === myId,
     like_count: likeCounts[p.id] || 0,
     liked_by_me: !!likedByMe[p.id],
     comment_count: commentCounts[p.id] || 0,
@@ -377,6 +381,33 @@ app.delete('/api/friends/:id', authMiddleware, async (req, res) => {
     .or(`requester_id.eq.${req.user.id},addressee_id.eq.${req.user.id}`).select();
   if (!data || !data.length) return res.status(404).json({ error: 'Not found' });
   res.json({ message: 'Removed' });
+});
+
+// Search users by (partial, case-insensitive) username — for finding friends.
+app.get('/api/users/search', authMiddleware, async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  if (q.length < 2) return res.json({ results: [] });
+
+  const { data: matches } = await supabase
+    .from('profiles').select('id, username')
+    .ilike('username', `%${q}%`)
+    .neq('id', req.user.id)
+    .limit(12);
+
+  // Annotate each match with the current friendship status so the UI can show
+  // "Add" / "Pending" / "Friends" without a second round-trip.
+  const ids = (matches || []).map(m => m.id);
+  const statusById = {};
+  if (ids.length) {
+    const { data: fr } = await supabase
+      .from('friendships').select('requester_id, addressee_id, status')
+      .or(`and(requester_id.eq.${req.user.id},addressee_id.in.(${ids.join(',')})),and(addressee_id.eq.${req.user.id},requester_id.in.(${ids.join(',')}))`);
+    for (const f of (fr || [])) {
+      const other = f.requester_id === req.user.id ? f.addressee_id : f.requester_id;
+      statusById[other] = f.status;
+    }
+  }
+  res.json({ results: (matches || []).map(m => ({ ...m, status: statusById[m.id] || 'none' })) });
 });
 
 app.get('/api/friends', authMiddleware, async (req, res) => {
@@ -626,6 +657,15 @@ app.post('/api/messages/:userId', authMiddleware, async (req, res) => {
 
   pushToUser(req.params.userId, { type: 'new_message', from: { id: req.user.id, username: req.user.username }, content, created_at: doc.created_at });
   res.json({ id: doc.id, message: 'Sent' });
+});
+
+// Delete a message you sent (removes it from the conversation for both people).
+app.delete('/api/messages/:id', authMiddleware, async (req, res) => {
+  const { data } = await supabase
+    .from('messages').delete().eq('id', req.params.id).eq('sender_id', req.user.id).select();
+  if (!data || !data.length) return res.status(404).json({ error: 'Message not found' });
+  pushToUser(data[0].recipient_id, { type: 'message_deleted', id: req.params.id });
+  res.json({ message: 'Deleted' });
 });
 
 // ── Challenges ───────────────────────────────────────────────────

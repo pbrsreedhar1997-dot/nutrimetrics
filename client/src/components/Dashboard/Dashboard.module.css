@@ -60,8 +60,8 @@
 .appBanner {
   display: flex; align-items: center; gap: 14px;
   padding: 16px 18px; border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(0,229,192,0.12), rgba(0,153,255,0.10));
-  border: 1px solid rgba(0,229,192,0.28);
+  background: linear-gradient(135deg, rgba(214,124,82,0.12), rgba(0,153,255,0.10));
+  border: 1px solid rgba(214,124,82,0.28);
   text-decoration: none; transition: all 0.2s;
 }
 .appBanner:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-accent); }
@@ -92,8 +92,8 @@
 /* ── Get the app (Android + iOS) ───── */
 .getApp {
   padding: 16px 18px; border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(0,229,192,0.10), rgba(0,153,255,0.09));
-  border: 1px solid rgba(0,229,192,0.26);
+  background: linear-gradient(135deg, rgba(214,124,82,0.10), rgba(0,153,255,0.09));
+  border: 1px solid rgba(214,124,82,0.26);
   display: flex; flex-direction: column; gap: 14px;
 }
 .getAppHead { display: flex; align-items: center; gap: 12px; }

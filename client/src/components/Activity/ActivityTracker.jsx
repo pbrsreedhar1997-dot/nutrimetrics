@@ -8,9 +8,9 @@ const STRIDE_M = 0.762
 // ── Signal processing constants ───────────────────────────────────────
 const LP_ALPHA       = 0.78   // low-pass: remove high-freq vibration
 const BASELINE_ALPHA = 0.99   // baseline: slow drift removal (faster settle than 0.995)
-const PEAK_HIGH      = 1.0    // m/s² — signal must rise above this to begin a step
-const PEAK_LOW       = 0.30   // m/s² — signal must fall below this to CONFIRM the step
-const MIN_STEP_MS    = 300    // minimum gap between steps (double-count guard)
+const PEAK_HIGH      = 1.35   // m/s² — raised to reject light hand movement as steps
+const PEAK_LOW       = 0.35   // m/s² — signal must fall below this to CONFIRM the step
+const MIN_STEP_MS    = 340    // minimum gap between steps (double-count guard)
 const WARMUP_MS      = 2000   // skip counting during first 2 s while baseline settles
 
 // ── NOTE: No MAX_STEP_MS check — that was the bug.
@@ -248,7 +248,7 @@ export default function ActivityTracker({ token, userStats }) {
             <svg className={styles.ring} viewBox="0 0 160 160">
               <defs>
                 <linearGradient id="stepGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#00e5c0"/>
+                  <stop offset="0%" stopColor="#d67c52"/>
                   <stop offset="100%" stopColor="#60a5fa"/>
                 </linearGradient>
               </defs>

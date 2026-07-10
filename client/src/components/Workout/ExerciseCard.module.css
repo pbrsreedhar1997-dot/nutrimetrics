@@ -77,7 +77,7 @@
 .tip {
   font-size: 11px; color: var(--text2); line-height: 1.5;
   padding: 7px 10px;
-  background: rgba(0,229,192,0.05);
+  background: rgba(214,124,82,0.05);
   border-radius: 5px;
   border-left: 2px solid var(--accent);
 }

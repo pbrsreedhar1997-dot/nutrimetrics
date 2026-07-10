@@ -41,7 +41,7 @@
   stroke-dasharray: 327;
   stroke-dashoffset: 327;
   transition: stroke-dashoffset 0.7s cubic-bezier(0.34,1.56,0.64,1);
-  filter: drop-shadow(0 0 6px rgba(0,229,192,0.5));
+  filter: drop-shadow(0 0 6px rgba(214,124,82,0.5));
 }
 .ringInner {
   position: absolute; inset: 0;
@@ -187,7 +187,7 @@
 }
 .suggestContainer input:focus {
   outline: none; border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0,229,192,0.1);
+  box-shadow: 0 0 0 3px rgba(214,124,82,0.1);
   background: var(--surface3);
 }
 .suggestContainer input::placeholder { color: var(--text4); }
@@ -226,7 +226,7 @@
 .inputWrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .inputWrap input:focus {
   outline: none; border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0,229,192,0.1);
+  box-shadow: 0 0 0 3px rgba(214,124,82,0.1);
   background: var(--surface3);
 }
 .unit {

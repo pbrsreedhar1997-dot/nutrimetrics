@@ -14,4 +14,4 @@
   cursor: pointer; white-space: nowrap; transition: all 0.2s; letter-spacing: 0.2px;
 }
 .subTab:hover { color: var(--text2); background: var(--surface3); }
-.subTab.active { background: var(--grad-accent); color: #000; box-shadow: 0 2px 14px rgba(0,229,192,0.28); }
+.subTab.active { background: var(--grad-accent); color: #000; box-shadow: 0 2px 14px rgba(214,124,82,0.28); }

@@ -55,3 +55,17 @@
 .colBarToday { background: var(--grad-accent); }
 .colVal { font-size: 10px; font-weight: 700; color: var(--text2); font-family: 'DM Mono', monospace; }
 .colLabel { font-size: 10px; color: var(--text3); }
+
+/* ── Full history ── */
+.histBtn {
+  margin-top: 14px; width: 100%; padding: 11px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border); color: var(--accent);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
+}
+.histBtn:hover { border-color: var(--accent); }
+.histList { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; }
+.histRow {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text2);
+}
+.histRow strong { color: var(--text); font-family: 'DM Mono', monospace; }

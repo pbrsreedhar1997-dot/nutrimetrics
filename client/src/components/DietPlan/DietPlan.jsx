@@ -169,7 +169,7 @@ export default function DietPlan({ userStats, onGoToBMI }) {
         <div className={styles.cardTitle}>Daily Macros</div>
         <div className={styles.macroRow}>
           {[
-            { name: 'Protein', grams: plan.macros.protein, pct: proteinPct, color: '#00e5c0', bar: '#00e5c0' },
+            { name: 'Protein', grams: plan.macros.protein, pct: proteinPct, color: '#d67c52', bar: '#d67c52' },
             { name: 'Carbs',   grams: plan.macros.carbs,   pct: carbsPct,   color: '#fbbf24', bar: '#fbbf24' },
             { name: 'Fat',     grams: plan.macros.fat,     pct: fatPct,     color: '#a78bfa', bar: '#a78bfa' },
           ].map(m => (

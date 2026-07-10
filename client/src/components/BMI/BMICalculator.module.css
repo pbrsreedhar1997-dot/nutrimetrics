@@ -60,7 +60,7 @@
 }
 .unitToggle button.active {
   background: var(--grad-accent); color: #000;
-  box-shadow: 0 2px 8px rgba(0,229,192,0.28);
+  box-shadow: 0 2px 8px rgba(214,124,82,0.28);
 }
 
 .inputWrap { position: relative; display: flex; align-items: center; }
@@ -80,7 +80,7 @@
 .inputWrap input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0,229,192,0.1), inset 0 0 0 1px rgba(0,229,192,0.04);
+  box-shadow: 0 0 0 3px rgba(214,124,82,0.1), inset 0 0 0 1px rgba(214,124,82,0.04);
   background: var(--surface3);
 }
 .unit {
@@ -118,7 +118,7 @@
   box-shadow: var(--shadow-accent);
   letter-spacing: 0.3px;
 }
-.calcBtn:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0,229,192,0.38); }
+.calcBtn:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(214,124,82,0.38); }
 .calcBtn:active { transform: translateY(0); }
 
 /* ── Result card ────────────────────────────── */
@@ -208,8 +208,8 @@
 /* Protein suggestion */
 .proteinSuggest {
   margin-top: 18px; padding: 16px 18px;
-  background: rgba(0,229,192,0.05);
-  border: 1px solid rgba(0,229,192,0.18);
+  background: rgba(214,124,82,0.05);
+  border: 1px solid rgba(214,124,82,0.18);
   border-radius: var(--radius-sm);
   position: relative; overflow: hidden;
 }

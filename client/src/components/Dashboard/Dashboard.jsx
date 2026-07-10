@@ -133,7 +133,7 @@ export default function Dashboard({ token, username, userStats, onNavigate }) {
       </div>
 
       <div className={styles.rings}>
-        <Ring value={steps}          max={stepGoal}    label="Steps"    unit="steps"   color="#00e5c0" />
+        <Ring value={steps}          max={stepGoal}    label="Steps"    unit="steps"   color="#d67c52" />
         <Ring value={Math.round(caloriesEaten)} max={calGoal} label="Calories" unit="eaten" color="#ff9f43" />
         <Ring value={proteinToday}   max={proteinGoal} label="Protein"  unit="grams"   color="#5b9cf6" />
         <Ring value={active}         max={60}          label="Active"   unit="mins"    color="#a855f7" />

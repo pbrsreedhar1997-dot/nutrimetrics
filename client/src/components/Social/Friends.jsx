@@ -1,13 +1,16 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiCall } from '../../api'
 import styles from './Social.module.css'
 
 export default function Friends({ token, socket }) {
   const [friends, setFriends]   = useState([])
   const [requests, setRequests] = useState([])
-  const [username, setUsername] = useState('')
-  const [msg, setMsg]           = useState('')
+  const [query, setQuery]       = useState('')
+  const [results, setResults]   = useState([])
+  const [searching, setSearching] = useState(false)
+  const [sent, setSent]         = useState({}) // userId -> true once a request is sent
   const [loading, setLoading]   = useState(true)
+  const debounce = useRef(null)
 
   const load = useCallback(async () => {
     const [f, r] = await Promise.all([
@@ -28,12 +31,23 @@ export default function Friends({ token, socket }) {
     return () => { offReq(); offAcc() }
   }, [socket, load])
 
-  async function sendRequest(e) {
-    e.preventDefault()
-    setMsg('')
-    const res = await apiCall('POST', '/friends/request', { username: username.trim() }, token)
-    setMsg(res.error || res.message)
-    if (!res.error) setUsername('')
+  // Live, case-insensitive, partial-match search as you type.
+  useEffect(() => {
+    clearTimeout(debounce.current)
+    const q = query.trim()
+    if (q.length < 2) { setResults([]); setSearching(false); return }
+    setSearching(true)
+    debounce.current = setTimeout(async () => {
+      const res = await apiCall('GET', `/users/search?q=${encodeURIComponent(q)}`, null, token)
+      setResults(res.results || [])
+      setSearching(false)
+    }, 300)
+    return () => clearTimeout(debounce.current)
+  }, [query, token])
+
+  async function addFriend(userId, username) {
+    setSent(s => ({ ...s, [userId]: true }))
+    await apiCall('POST', '/friends/request', { username }, token)
   }
 
   async function respond(id, action) {
@@ -46,18 +60,38 @@ export default function Friends({ token, socket }) {
     load()
   }
 
+  function labelFor(r) {
+    if (r.status === 'accepted') return 'Friends'
+    if (r.status === 'pending')  return 'Pending'
+    if (sent[r.id])              return 'Requested'
+    return null
+  }
+
   if (loading) return <div className={styles.loading}>Loading friends…</div>
 
   return (
     <div className={styles.panel}>
-      <form className={styles.addForm} onSubmit={sendRequest}>
-        <input
-          type="text" placeholder="Add a friend by username"
-          value={username} onChange={e => setUsername(e.target.value)} required
-        />
-        <button type="submit">Send Request</button>
-      </form>
-      {msg && <div className={styles.msg}>{msg}</div>}
+      <div className={styles.addForm}>
+        <input type="text" placeholder="Search people by name…" value={query}
+          onChange={e => setQuery(e.target.value)} />
+      </div>
+
+      {query.trim().length >= 2 && (
+        <div className={styles.searchResults}>
+          {searching && <div className={styles.spinnerSm}>Searching…</div>}
+          {!searching && results.length === 0 && <div className={styles.empty}>No one found matching “{query.trim()}”.</div>}
+          {results.map(r => {
+            const lbl = labelFor(r)
+            return (
+              <div key={r.id} className={styles.searchRow}>
+                <span>{r.username}</span>
+                {lbl ? <span className={styles.statusTag}>{lbl}</span>
+                     : <button onClick={() => addFriend(r.id, r.username)}>Add</button>}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {requests.length > 0 && (
         <div className={styles.section}>

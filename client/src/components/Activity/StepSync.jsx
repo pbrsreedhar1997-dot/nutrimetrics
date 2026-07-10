@@ -18,6 +18,7 @@ export default function StepSync({ token, userStats }) {
   const [editGoal,  setEditGoal]  = useState(false)
   const [goalInput, setGoalInput] = useState('10000')
   const [history,   setHistory]   = useState([])
+  const [fullHistory, setFullHistory] = useState(null) // lazy-loaded up to a year
   const [status,    setStatus]    = useState('')
   const [lastSync,  setLastSync]  = useState(null)
 
@@ -210,6 +211,24 @@ export default function StepSync({ token, userStats }) {
               </div>
             ))}
           </div>
+
+          {/* Full history — every day is stored permanently and can be revisited */}
+          {!fullHistory ? (
+            <button className={styles.histBtn} onClick={async () => {
+              const d = await fetch(`${API}/activity-log?limit=365`, { headers }).then(r => r.json())
+              setFullHistory(d.logs || [])
+            }}>View full history →</button>
+          ) : (
+            <div className={styles.histList}>
+              <div className={styles.historyHead} style={{ marginTop: 14 }}>All-time · {fullHistory.length} days recorded</div>
+              {fullHistory.map(l => (
+                <div key={l.id} className={styles.histRow}>
+                  <span>{new Date(l.date).toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short', year: '2-digit' })}</span>
+                  <strong>{(l.steps || 0).toLocaleString()} steps</strong>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

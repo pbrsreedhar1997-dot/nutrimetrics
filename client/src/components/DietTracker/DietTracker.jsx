@@ -186,7 +186,7 @@ export default function DietTracker({ token, userStats }) {
         background:'linear-gradient(135deg,rgba(52,211,153,0.07) 0%,rgba(96,165,250,0.05) 100%)',
         borderColor:'rgba(52,211,153,0.22)'
       }}>
-        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,#34d399,#00e5c0,#60a5fa)'}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,#34d399,#d67c52,#60a5fa)'}}/>
         <div className="tab-intro-icon" style={{background:'rgba(52,211,153,0.12)',border:'1px solid rgba(52,211,153,0.25)'}}>🥗</div>
         <div>
           <div className="tab-intro-title">Diet Tracker</div>

@@ -5,7 +5,7 @@
  */
 
 const DUR   = '3.5s'
-const ACC   = '#00e5c0'        // teal accent  (head / joints)
+const ACC   = '#d67c52'        // teal accent  (head / joints)
 const W     = 'rgba(255,255,255,0.90)' // main limbs
 const WT    = 'rgba(255,255,255,0.60)' // thinner / secondary limbs
 

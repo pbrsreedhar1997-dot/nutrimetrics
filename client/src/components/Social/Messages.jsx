@@ -15,13 +15,12 @@ function Thread({ token, other, socket, onBack }) {
   useEffect(() => { load() }, [load])
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
-  // Live-refresh the open thread when a new message arrives from this conversation.
+  // Live-refresh the open thread when a message arrives or is deleted.
   useEffect(() => {
     if (!socket) return
-    const off = socket.on('new_message', (msg) => {
-      if (msg.from?.id === other.id) load()
-    })
-    return () => off()
+    const offNew = socket.on('new_message', (msg) => { if (msg.from?.id === other.id) load() })
+    const offDel = socket.on('message_deleted', (msg) => setMessages(ms => ms.filter(m => m.id !== msg.id)))
+    return () => { offNew(); offDel() }
   }, [socket, other.id, load])
 
   async function send(e) {
@@ -32,16 +31,25 @@ function Thread({ token, other, socket, onBack }) {
     load()
   }
 
+  async function del(id) {
+    setMessages(ms => ms.filter(m => m.id !== id)) // optimistic
+    await apiCall('DELETE', `/messages/${id}`, null, token).catch(() => load())
+  }
+
   return (
     <div className={styles.thread}>
       <button className={styles.backBtn} onClick={onBack}>← Messages</button>
       <h3>{other.username}</h3>
       <div className={styles.threadMessages}>
-        {messages.map(m => (
-          <div key={m.id} className={`${styles.bubble} ${m.sender_id === other.id ? styles.bubbleThem : styles.bubbleMe}`}>
-            {m.content}
-          </div>
-        ))}
+        {messages.map(m => {
+          const mine = m.sender_id !== other.id
+          return (
+            <div key={m.id} className={`${styles.bubbleWrap} ${mine ? styles.mine : ''}`}>
+              <div className={`${styles.bubble} ${mine ? styles.bubbleMe : styles.bubbleThem}`}>{m.content}</div>
+              {mine && <button className={styles.msgDel} title="Delete" onClick={() => del(m.id)}>🗑</button>}
+            </div>
+          )
+        })}
         <div ref={bottomRef} />
       </div>
       <form className={styles.sendForm} onSubmit={send}>

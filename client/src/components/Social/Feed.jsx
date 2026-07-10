@@ -91,6 +91,12 @@ function Post({ token, post, onChanged }) {
     setLike(true)
   }
 
+  async function deletePost() {
+    if (!window.confirm('Delete this post?')) return
+    await apiCall('DELETE', `/posts/${post.id}`, null, token)
+    onChanged()
+  }
+
   async function openComments() {
     setShowComments(s => !s)
     if (!showComments) {
@@ -111,7 +117,10 @@ function Post({ token, post, onChanged }) {
 
   return (
     <div className={styles.postCard}>
-      <div className={styles.postAuthor}>{post.author}</div>
+      <div className={styles.postTop}>
+        <div className={styles.postAuthor}>{post.author}</div>
+        {post.is_mine && <button className={styles.delBtn} title="Delete post" onClick={deletePost}>🗑</button>}
+      </div>
       <div className={styles.postBody} onDoubleClick={onDoubleTap}>
         {post.kind === 'activity' ? (
           <div className={styles.postActivity}>
