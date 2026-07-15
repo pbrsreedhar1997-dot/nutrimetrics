@@ -1,6 +1,6 @@
 /* NutriMetrics service worker — minimal app-shell cache for PWA installability.
    Network-first for navigation so the app stays current; never caches /api. */
-const CACHE = 'nutrimetrics-v1'
+const CACHE = 'nutrimetrics-v2'
 
 self.addEventListener('install', e => { self.skipWaiting() })
 self.addEventListener('activate', e => {
@@ -9,7 +9,9 @@ self.addEventListener('activate', e => {
 })
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url)
-  if (url.pathname.startsWith('/api') || url.pathname.startsWith('/ws')) return // always live
+  // Always live — never cache: API calls, the websocket, and the APK download
+  // (a cached APK would silently keep serving a stale/mis-signed build forever).
+  if (url.pathname.startsWith('/api') || url.pathname.startsWith('/ws') || url.pathname.startsWith('/downloads/')) return
   if (e.request.mode === 'navigate') {
     e.respondWith(fetch(e.request).catch(() => caches.match('/')))
     return
